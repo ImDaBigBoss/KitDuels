@@ -1,0 +1,19 @@
+name: KitDuels
+version: ${project.version}
+main: com.github.imdabigboss.kitduels.KitDuels
+api-version: 1.17
+softdepend: [Multiverse-Core, MultiWorld, VoidGenerator]
+
+commands:
+  kd:
+    permission: kitduels.admin
+  joingame:
+    permission: kitduels.normal
+  leavegame:
+    permission: kitduels.normal
+
+permissions:
+  kitduels.admin:
+    default: op
+  kitduels.normal:
+    default: true
