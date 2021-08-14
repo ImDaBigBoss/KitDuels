@@ -7,6 +7,8 @@ softdepend: [Multiverse-Core, MultiWorld, VoidGenerator]
 commands:
   kd:
     permission: kitduels.admin
+  kdkits:
+    permission: kitduels.admin
   joingame:
     permission: kitduels.normal
   leavegame:

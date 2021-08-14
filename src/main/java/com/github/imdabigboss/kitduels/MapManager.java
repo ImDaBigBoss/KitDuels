@@ -5,6 +5,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Random;
 
 public class MapManager {
@@ -187,6 +188,11 @@ public class MapManager {
             mapPlayer.sendTitle(ChatColor.RED + "Fight!", " ", 0, 10, 10);
             mapPlayer.setGameMode(GameMode.SURVIVAL);
 
+            int index = new Random().nextInt(KitDuels.allKits.size());
+            String kitName = KitDuels.allKits.get(index);
+            KitDuels.loadKitToPlayer(mapPlayer, kitName);
+            mapPlayer.sendMessage(ChatColor.GREEN + "You got the " + ChatColor.GOLD + kitName + ChatColor.GREEN + " kit!");
+
             if (KitDuels.getMapsYML().getConfig().contains(map + ".spawn" + playerNum)) {
                 Location location = KitDuels.getMapsYML().getConfig().getLocation(map + ".spawn" + playerNum);
                 mapPlayer.teleport(location);
@@ -202,6 +208,8 @@ public class MapManager {
     public static void gameEnded(String map) {
         //TODO: Reset map
         for (Player player : KitDuels.enabledMaps.get(map)) {
+            player.setHealth(20);
+            player.setFoodLevel(20);
             KitDuels.sendToSpawn(player);
             KitDuels.playerMaps.remove(player);
         }

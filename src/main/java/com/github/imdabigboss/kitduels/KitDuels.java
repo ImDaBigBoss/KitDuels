@@ -3,13 +3,18 @@ package com.github.imdabigboss.kitduels;
 import com.github.imdabigboss.kitduels.commands.JoinGameCommand;
 import com.github.imdabigboss.kitduels.commands.KitDuelsCommand;
 
+import com.github.imdabigboss.kitduels.commands.KitDuelsKitsCommand;
 import com.github.imdabigboss.kitduels.commands.LeaveGameCommand;
+import com.github.imdabigboss.kitduels.util.InventorySerialization;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -17,6 +22,7 @@ public final class KitDuels extends JavaPlugin {
     private static final Logger log = Logger.getLogger("Minecraft");
     private static KitDuels instance = null;
     private static YMLUtils mapsYML = null;
+    private static YMLUtils kitsYML = null;
 
     public static Map<Player, String> editModePlayers = new HashMap<>();
 
@@ -25,6 +31,8 @@ public final class KitDuels extends JavaPlugin {
     public static List<String> allMaps = new ArrayList<>();
     public static Map<Player, String> playerMaps = new HashMap<>();
     public static List<String> ongoingMaps = new ArrayList<>();
+
+    public static List<String> allKits = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -46,6 +54,7 @@ public final class KitDuels extends JavaPlugin {
         log.info(String.format("[%s] Finishing setup...", getDescription().getName(), getDescription().getVersion()));
 
         mapsYML = new YMLUtils("maps.yml");
+        kitsYML = new YMLUtils("kits.yml");
 
         getServer().getPluginManager().registerEvents(new EventListener(this), this);
 
@@ -58,7 +67,15 @@ public final class KitDuels extends JavaPlugin {
             }
         }
 
+        if (kitsYML.getConfig().contains("allKits")) {
+            if (kitsYML.getConfig().get("allKits") != null) {
+                List<String> kits = kitsYML.getConfig().getStringList("allKits");
+                allKits.addAll(kits);
+            }
+        }
+
         this.getCommand("kd").setExecutor(new KitDuelsCommand(this));
+        this.getCommand("kdkits").setExecutor(new KitDuelsKitsCommand(this));
         this.getCommand("joingame").setExecutor(new JoinGameCommand(this));
         this.getCommand("leavegame").setExecutor(new LeaveGameCommand(this));
 
@@ -83,6 +100,24 @@ public final class KitDuels extends JavaPlugin {
         player.getInventory().clear();
     }
 
+    public static boolean loadKitToPlayer(Player player, String kitName) {
+        player.getInventory().clear();
+
+        Inventory content;
+        ItemStack[] armor;
+
+        try {
+            content = InventorySerialization.fromBase64(kitsYML.getConfig().getString(kitName + ".content"));
+            armor = InventorySerialization.itemStackArrayFromBase64(kitsYML.getConfig().getString(kitName + ".armor"));
+        } catch (IOException e) {
+            return false;
+        }
+
+        player.getInventory().setContents(content.getContents());
+        player.getInventory().setArmorContents(armor);
+        return true;
+    }
+
     public static Logger getLog() {
         return log;
     }
@@ -91,5 +126,8 @@ public final class KitDuels extends JavaPlugin {
     }
     public static YMLUtils getMapsYML() {
         return mapsYML;
+    }
+    public static YMLUtils getKitsYML() {
+        return kitsYML;
     }
 }
