@@ -68,6 +68,8 @@ public class EventListener implements Listener {
                             winPlayer = alivePlayer;
                         }
 
+                        KitDuels.ongoingMaps.remove(map);
+
                         for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
                             mapPlayer.sendMessage(winPlayer.getDisplayName() + " wins!");
                             if (mapPlayer == winPlayer) {

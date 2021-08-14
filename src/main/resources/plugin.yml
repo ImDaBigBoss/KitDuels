@@ -13,9 +13,13 @@ commands:
     permission: kitduels.normal
   leavegame:
     permission: kitduels.normal
+  kitselect:
+    permission: kitduels.kitselect
 
 permissions:
   kitduels.admin:
     default: op
   kitduels.normal:
+    default: true
+  kitduels.kitselect:
     default: true

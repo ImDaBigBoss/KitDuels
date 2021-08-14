@@ -1,10 +1,7 @@
 package com.github.imdabigboss.kitduels;
 
-import com.github.imdabigboss.kitduels.commands.JoinGameCommand;
-import com.github.imdabigboss.kitduels.commands.KitDuelsCommand;
+import com.github.imdabigboss.kitduels.commands.*;
 
-import com.github.imdabigboss.kitduels.commands.KitDuelsKitsCommand;
-import com.github.imdabigboss.kitduels.commands.LeaveGameCommand;
 import com.github.imdabigboss.kitduels.util.InventorySerialization;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -31,8 +28,10 @@ public final class KitDuels extends JavaPlugin {
     public static List<String> allMaps = new ArrayList<>();
     public static Map<Player, String> playerMaps = new HashMap<>();
     public static List<String> ongoingMaps = new ArrayList<>();
+    public static List<String> inUseMaps = new ArrayList<>();
 
     public static List<String> allKits = new ArrayList<>();
+    public static Map<Player, String> playerKits = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -78,6 +77,7 @@ public final class KitDuels extends JavaPlugin {
         this.getCommand("kdkits").setExecutor(new KitDuelsKitsCommand(this));
         this.getCommand("joingame").setExecutor(new JoinGameCommand(this));
         this.getCommand("leavegame").setExecutor(new LeaveGameCommand(this));
+        this.getCommand("kitselect").setExecutor(new KitSelectCommand(this));
 
         log.info(String.format("[%s] Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }
