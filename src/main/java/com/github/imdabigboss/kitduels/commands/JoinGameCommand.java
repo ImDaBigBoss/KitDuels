@@ -3,6 +3,7 @@ package com.github.imdabigboss.kitduels.commands;
 import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.MapManager;
 import com.github.imdabigboss.kitduels.YMLUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -27,6 +28,14 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You must be a player to use this command!");
+            return true;
+        }
+
+        if (KitDuels.editModePlayers.containsKey((Player) sender)) {
+            sender.sendMessage(ChatColor.RED + "You are currently editing a map!");
+        }
+        if (KitDuels.playerMaps.containsKey((Player) sender)) {
+            sender.sendMessage(ChatColor.RED + "You are already in a game!");
             return true;
         }
 
@@ -74,7 +83,7 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
             if (selectedPlayerNum) {
                 sender.sendMessage(ChatColor.RED + "Either no slots, no maps, or both are available for the selected amount of players!");
             } else {
-                sender.sendMessage(ChatColor.RED + "No slots available!");
+                sender.sendMessage(ChatColor.RED + "Either no slots or no maps are available!");
             }
             return true;
         }

@@ -1,11 +1,15 @@
 package com.github.imdabigboss.kitduels;
 
 import com.github.imdabigboss.kitduels.util.CountdownTimer;
+import com.github.imdabigboss.kitduels.util.EntityUtils;
+import com.github.imdabigboss.kitduels.util.WorldEditUtils;
+
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class MapManager {
@@ -13,7 +17,8 @@ public class MapManager {
         WorldCreator wc = new WorldCreator(name);
         wc.generator("VoidGenerator");
         wc.type(WorldType.NORMAL);
-        wc.createWorld();
+        World out = wc.createWorld();
+        //TODO: Set game rules
         KitDuels.allMaps.add(name);
         KitDuels.getInstance().getConfig().set("allMaps", KitDuels.allMaps);
         KitDuels.getInstance().saveConfig();
@@ -68,8 +73,19 @@ public class MapManager {
         }
 
         if (currentNumPlayers == 0) {
-            int index = new Random().nextInt(KitDuels.enabledMaps.size());
-            currentMap = new ArrayList<>(KitDuels.enabledMaps.keySet()).get(index);
+            List<String> maps = new ArrayList<>();
+            for (String map : KitDuels.enabledMaps.keySet()) {
+                if (!KitDuels.inUseMaps.contains(map)) {
+                    maps.add(map);
+                }
+            }
+
+            if (maps.size() == 0) {
+                return "";
+            }
+
+            int index = new Random().nextInt(maps.size());
+            currentMap = maps.get(index);
         }
 
         return currentMap;
@@ -85,7 +101,7 @@ public class MapManager {
             return;
         }
         if (KitDuels.inUseMaps.contains(map)) {
-            player.sendMessage(ChatColor.RED + "The map you were sent to has an ongoing game!");
+            player.sendMessage(ChatColor.RED + "The map you were sent to is in use!");
             return;
         }
 
@@ -150,6 +166,16 @@ public class MapManager {
                     mapPlayer.sendMessage(player.getDisplayName() + " has left" + gameOver);
                 }
 
+                if (player.isOnline()) {
+                    player.setHealth(20);
+                    player.setFoodLevel(20);
+                    for (PotionEffect effect : player.getActivePotionEffects()) {
+                        player.removePotionEffect(effect.getType());
+                    }
+                    KitDuels.sendToSpawn(player);
+                    player.sendMessage("You left the map");
+                }
+
                 gameEnded(map);
             } else {
                 if (!KitDuels.mapAlivePlayers.containsKey(map)) {
@@ -157,7 +183,7 @@ public class MapManager {
                         mapPlayer.sendMessage(player.getDisplayName() + " has left (" + ChatColor.GREEN + KitDuels.enabledMaps.get(map).size() + "/" + getMapMaxPlayers(map) + ChatColor.RESET + ")");
                     }
 
-                    if (exists) {
+                    if (player.isOnline()) {
                         player.sendMessage("You left the map");
                         KitDuels.sendToSpawn(player);
                     }
@@ -220,7 +246,6 @@ public class MapManager {
     }
 
     public static void gameEnded(String map) {
-        //TODO: Reset map
         for (Player player : KitDuels.enabledMaps.get(map)) {
             if (!player.isOnline()) {
                 continue;
@@ -238,6 +263,14 @@ public class MapManager {
         KitDuels.mapAlivePlayers.remove(map);
         KitDuels.enabledMaps.get(map).clear();
         KitDuels.ongoingMaps.remove(map);
+
+        Location pos1 = KitDuels.getMapsYML().getConfig().getLocation(map + ".pos1");
+        Location pos2 = KitDuels.getMapsYML().getConfig().getLocation(map + ".pos2");
+        Location[] region = WorldEditUtils.getCloneRegion(pos1, pos2);
+        WorldEditUtils.removeRegion(pos1, pos2);
+        WorldEditUtils.cloneRegion(region[0], region[1], pos1);
+        EntityUtils.killEntities(pos1, pos2);
+
         KitDuels.inUseMaps.remove(map);
     }
 }

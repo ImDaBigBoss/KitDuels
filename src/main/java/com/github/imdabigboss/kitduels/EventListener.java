@@ -12,9 +12,6 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class EventListener implements Listener {
     private KitDuels plugin;
 
@@ -71,6 +68,8 @@ public class EventListener implements Listener {
                         KitDuels.ongoingMaps.remove(map);
 
                         for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
+                            mapPlayer.setHealth(20);
+                            mapPlayer.setFoodLevel(20);
                             mapPlayer.sendMessage(winPlayer.getDisplayName() + " wins!");
                             if (mapPlayer == winPlayer) {
                                 mapPlayer.sendTitle(ChatColor.GOLD + "VICTORY!", "You won the game", 0, 60, 10);

@@ -1,20 +1,16 @@
 package com.github.imdabigboss.kitduels.commands;
 
 import com.github.imdabigboss.kitduels.KitDuels;
-import com.github.imdabigboss.kitduels.MapManager;
 import com.github.imdabigboss.kitduels.YMLUtils;
+
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class KitSelectCommand implements CommandExecutor, TabExecutor {
     private KitDuels plugin;

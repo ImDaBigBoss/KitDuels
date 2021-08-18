@@ -2,7 +2,7 @@ package com.github.imdabigboss.kitduels.commands;
 
 import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.MapManager;
-import com.github.imdabigboss.kitduels.YMLUtils;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,7 +15,6 @@ import java.util.List;
 
 public class LeaveGameCommand implements CommandExecutor, TabExecutor {
     private KitDuels plugin;
-    private YMLUtils mapsYML;
 
     public LeaveGameCommand(KitDuels plugin) {
         super();

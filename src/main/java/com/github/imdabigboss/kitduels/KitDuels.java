@@ -1,11 +1,9 @@
 package com.github.imdabigboss.kitduels;
 
 import com.github.imdabigboss.kitduels.commands.*;
-
 import com.github.imdabigboss.kitduels.util.InventorySerialization;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.WorldCreator;
+
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -44,7 +42,10 @@ public final class KitDuels extends JavaPlugin {
             if (this.getConfig().get("allMaps") != null) {
                 List<String> maps = this.getConfig().getStringList("allMaps");
                 for (String map : maps) {
-                    new WorldCreator(map).createWorld();
+                    WorldCreator wc = new WorldCreator(map);
+                    wc.generator("VoidGenerator");
+                    wc.type(WorldType.NORMAL);
+                    wc.createWorld();
                     allMaps.add(map);
                 }
             }
