@@ -96,7 +96,7 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         ArrayList<String> cmds = new ArrayList<>();
         if (args.length == 1) {
-            cmds.addAll(mapsYML.getConfig().getKeys(false));
+            cmds.addAll(KitDuels.enabledMaps.keySet());
             cmds.add("2");
             cmds.add("3");
             cmds.add("4");

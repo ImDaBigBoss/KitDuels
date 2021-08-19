@@ -37,6 +37,10 @@ public class KitDuelsKitsCommand implements CommandExecutor, TabExecutor {
         } else {
             if (args[0].equals("add")) {
                 if (args.length == 2) {
+                    if (args[1].equalsIgnoreCase("random")) {
+                        sender.sendMessage(ChatColor.RED + "That kit name is reserved!");
+                        return true;
+                    }
                     if (KitDuels.allKits.contains(args[1])) {
                         sender.sendMessage(ChatColor.RED + "That kit already exists!");
                         return true;
@@ -95,6 +99,10 @@ public class KitDuelsKitsCommand implements CommandExecutor, TabExecutor {
                     sendHelp(sender);
                 }
             } else if (args[0].equalsIgnoreCase("saveAs")) {
+                if (args[1].equalsIgnoreCase("random")) {
+                    sender.sendMessage(ChatColor.RED + "That kit name is reserved!");
+                    return true;
+                }
                 if (!KitDuels.allKits.contains(args[1])) {
                     KitDuels.allKits.add(args[1]);
                     kitsYML.getConfig().set("allKits", KitDuels.allKits);
@@ -120,7 +128,7 @@ public class KitDuelsKitsCommand implements CommandExecutor, TabExecutor {
 
                 sender.sendMessage(ChatColor.AQUA + "Your kit was saved. Its contents is your current inventory!");
             } else if (args[0].equals("list")) {
-                String kitList = "Here are all the kits:";
+                String kitList = "Here are all the kits:\n - RANDOM";
                 for (String kit : KitDuels.allKits) {
                     kitList += "\n - " + kit;
                 }

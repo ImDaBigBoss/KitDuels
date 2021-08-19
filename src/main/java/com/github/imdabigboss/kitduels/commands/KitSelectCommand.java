@@ -14,12 +14,10 @@ import java.util.List;
 
 public class KitSelectCommand implements CommandExecutor, TabExecutor {
     private KitDuels plugin;
-    private YMLUtils mapsYML;
 
     public KitSelectCommand(KitDuels plugin) {
         super();
         this.plugin = plugin;
-        this.mapsYML = KitDuels.getMapsYML();
     }
 
     @Override
@@ -34,12 +32,16 @@ public class KitSelectCommand implements CommandExecutor, TabExecutor {
             return true;
         }
 
-        if (!KitDuels.allKits.contains(args[0])) {
-            sender.sendMessage(ChatColor.RED + "That kit does not exist!");
-            return true;
+        if (args[0].equalsIgnoreCase("random")) {
+            KitDuels.playerKits.remove(player);
+        } else {
+            if (!KitDuels.allKits.contains(args[0])) {
+                sender.sendMessage(ChatColor.RED + "That kit does not exist!");
+                return true;
+            }
+            KitDuels.playerKits.put(player, args[0]);
         }
 
-        KitDuels.playerKits.put(player, args[0]);
         sender.sendMessage(ChatColor.AQUA + "You have selected the " + args[0] + " kit!");
         return true;
     }
@@ -50,7 +52,6 @@ public class KitSelectCommand implements CommandExecutor, TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        List<String> cmds = KitDuels.allKits;
-        return cmds;
+        return KitDuels.allKits;
     }
 }
