@@ -48,10 +48,8 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
         if (args.length == 1) {
             try {
                 selectedPlayerNum = true;
-                int num = Integer.parseInt(args[0]);
-                playerNum = num;
+                playerNum = Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                selectedMap = true;
                 mapName = args[0];
                 selectedMap = true;
             }

@@ -59,31 +59,25 @@ public class MapManager {
     public static String getNextMap(int players) {
         int currentNumPlayers = -1;
         String currentMap = "";
+        List<String> maps = new ArrayList<>();
 
         for (String map : KitDuels.enabledMaps.keySet()) {
-            if (KitDuels.inUseMaps.contains(map)) {
-                continue;
-            }
+            if (getMapMaxPlayers(map) == players) {
+                maps.add(map);
 
-            int num = KitDuels.enabledMaps.get(map).size();
-            if (num > currentNumPlayers && num < getMapMaxPlayers(map) && getMapMaxPlayers(map) == players) {
-                currentNumPlayers = num;
-                currentMap = map;
+                int num = KitDuels.enabledMaps.get(map).size();
+                if (num > currentNumPlayers && num < getMapMaxPlayers(map)) {
+                    currentNumPlayers = num;
+                    currentMap = map;
+                }
             }
         }
 
+        if (maps.size() == 0) {
+            return "";
+        }
+
         if (currentNumPlayers == 0) {
-            List<String> maps = new ArrayList<>();
-            for (String map : KitDuels.enabledMaps.keySet()) {
-                if (!KitDuels.inUseMaps.contains(map)) {
-                    maps.add(map);
-                }
-            }
-
-            if (maps.size() == 0) {
-                return "";
-            }
-
             int index = new Random().nextInt(maps.size());
             currentMap = maps.get(index);
         }
