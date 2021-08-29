@@ -234,7 +234,8 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                 Set<String> keys = mapsYML.getConfig().getKeys(false);
                 String maps = "The existing maps are:";
                 for (String key : keys) {
-                    maps += "\n - " + key;
+                    int max = MapManager.getMapMaxPlayers(key);
+                    maps += "\n - " + key + " " + max + " players";
                     if (KitDuels.enabledMaps.containsKey(key)) {
                         maps += ChatColor.GREEN + " ENABLED" + ChatColor.RESET;
                     } else {

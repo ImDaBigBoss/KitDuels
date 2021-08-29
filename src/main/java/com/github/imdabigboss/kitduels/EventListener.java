@@ -2,6 +2,7 @@ package com.github.imdabigboss.kitduels;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,8 +10,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 public class EventListener implements Listener {
     private KitDuels plugin;
@@ -73,10 +77,11 @@ public class EventListener implements Listener {
                             mapPlayer.sendMessage(winPlayer.getDisplayName() + " wins!");
                             if (mapPlayer == winPlayer) {
                                 mapPlayer.sendTitle(ChatColor.GOLD + "VICTORY!", "You won the game", 0, 60, 10);
+                                mapPlayer.setGameMode(GameMode.ADVENTURE);
                             } else {
                                 mapPlayer.sendTitle(ChatColor.RED + "DEFEAT!", winPlayer.getDisplayName() + ChatColor.GREEN + " won the game", 0, 60, 10);
+                                mapPlayer.setGameMode(GameMode.SPECTATOR);
                             }
-                            mapPlayer.setGameMode(GameMode.ADVENTURE);
                         }
 
                         plugin.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
@@ -99,5 +104,22 @@ public class EventListener implements Listener {
         event.setCancelled(true);
         Player player = (Player) event.getEntity();
         player.setFoodLevel(20);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerUse(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if (!KitDuels.playerMaps.containsKey(player)) {
+            return;
+        }
+        String playerMap = KitDuels.playerMaps.get(player);
+        if (KitDuels.ongoingMaps.contains(playerMap)) {
+            return;
+        }
+
+        ItemStack item = player.getInventory().getItem(EquipmentSlot.HAND);
+        if (item.getType() == Material.CHEST) {
+            KitDuels.openKitSelectGUIPlayer(player);
+        }
     }
 }

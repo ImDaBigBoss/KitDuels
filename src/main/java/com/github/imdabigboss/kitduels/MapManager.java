@@ -6,6 +6,8 @@ import com.github.imdabigboss.kitduels.util.WorldEditUtils;
 
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
@@ -119,6 +121,12 @@ public class MapManager {
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
 
+        ItemStack item = new ItemStack(Material.CHEST);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName("Kit selection");
+        item.setItemMeta(meta);
+        player.getInventory().setItem(0, item);
+
         for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
             mapPlayer.sendMessage(player.getDisplayName() + " has joined (" + ChatColor.GREEN + playerNum + "/" + getMapMaxPlayers(map) + ChatColor.RESET + ")");
         }
@@ -206,6 +214,7 @@ public class MapManager {
             KitDuels.mapAlivePlayers.get(map).add(mapPlayer);
             mapPlayer.setHealth(20);
             mapPlayer.setFoodLevel(20);
+            mapPlayer.getInventory().clear();
 
             mapPlayer.sendMessage("Go, go, go!");
             mapPlayer.sendTitle(ChatColor.RED + "Fight!", " ", 0, 10, 10);
