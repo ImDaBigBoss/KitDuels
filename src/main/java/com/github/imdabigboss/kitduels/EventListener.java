@@ -33,7 +33,7 @@ public class EventListener implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        MapManager.removePlayerFromMap(player, false);
+        MapManager.removePlayerFromMap(player);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -120,6 +120,8 @@ public class EventListener implements Listener {
         ItemStack item = player.getInventory().getItem(EquipmentSlot.HAND);
         if (item.getType() == Material.CHEST) {
             KitDuels.openKitSelectGUIPlayer(player);
+        } else if (item.getType() == Material.RED_DYE) {
+            MapManager.removePlayerFromMap(player);
         }
     }
 }

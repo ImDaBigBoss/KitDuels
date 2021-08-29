@@ -155,7 +155,7 @@ public final class KitDuels extends JavaPlugin {
 
         ItemStack item = new ItemStack(Material.CYAN_SHULKER_BOX);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("Random");
+        meta.setDisplayName("Random kit");
         item.setItemMeta(meta);
 
         group.addElement(new StaticGuiElement('e', item, click -> {

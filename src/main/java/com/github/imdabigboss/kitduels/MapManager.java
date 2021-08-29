@@ -127,6 +127,12 @@ public class MapManager {
         item.setItemMeta(meta);
         player.getInventory().setItem(0, item);
 
+        item = new ItemStack(Material.RED_DYE);
+        meta = item.getItemMeta();
+        meta.setDisplayName("Leave game");
+        item.setItemMeta(meta);
+        player.getInventory().setItem(8, item);
+
         for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
             mapPlayer.sendMessage(player.getDisplayName() + " has joined (" + ChatColor.GREEN + playerNum + "/" + getMapMaxPlayers(map) + ChatColor.RESET + ")");
         }
@@ -149,7 +155,7 @@ public class MapManager {
         }
     }
 
-    public static boolean removePlayerFromMap(Player player, boolean exists) {
+    public static boolean removePlayerFromMap(Player player) {
         if (KitDuels.playerMaps.containsKey(player)) {
             String map = KitDuels.playerMaps.get(player);
 

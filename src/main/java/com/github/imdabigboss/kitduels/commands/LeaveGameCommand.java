@@ -29,7 +29,7 @@ public class LeaveGameCommand implements CommandExecutor, TabExecutor {
         }
         Player player = (Player) sender;
 
-        boolean out = MapManager.removePlayerFromMap(player, true);
+        boolean out = MapManager.removePlayerFromMap(player);
         if (!out) {
             sender.sendMessage(ChatColor.RED + "You are not in a game!");
         }
