@@ -1,7 +1,7 @@
 package com.github.imdabigboss.kitduels.commands;
 
 import com.github.imdabigboss.kitduels.KitDuels;
-import com.github.imdabigboss.kitduels.MapManager;
+import com.github.imdabigboss.kitduels.managers.MapManager;
 import com.github.imdabigboss.kitduels.YMLUtils;
 
 import de.themoep.inventorygui.GuiElementGroup;
@@ -15,7 +15,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 

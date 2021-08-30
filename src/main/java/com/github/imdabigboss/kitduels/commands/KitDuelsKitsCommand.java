@@ -1,5 +1,6 @@
 package com.github.imdabigboss.kitduels.commands;
 
+import com.github.imdabigboss.kitduels.managers.GameManager;
 import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.YMLUtils;
 import com.github.imdabigboss.kitduels.util.InventorySerialization;
@@ -90,7 +91,7 @@ public class KitDuelsKitsCommand implements CommandExecutor, TabExecutor {
                         return true;
                     }
 
-                    if (KitDuels.loadKitToPlayer(player, args[1])) {
+                    if (GameManager.loadKitToPlayer(player, args[1])) {
                         sender.sendMessage(ChatColor.AQUA + "You have loaded the kit into your inventory.");
                     } else {
                         sender.sendMessage(ChatColor.RED + "An error occurred: Unable to decode class type.");

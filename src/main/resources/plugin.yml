@@ -2,7 +2,7 @@ name: KitDuels
 version: ${project.version}
 main: com.github.imdabigboss.kitduels.KitDuels
 api-version: 1.17
-softdepend: [Multiverse-Core, MultiWorld, VoidGenerator, WorldEdit]
+softdepend: [Multiverse-Core, MultiWorld, VoidGenerator, WorldEdit, HolographicDisplays]
 
 commands:
   kd:

@@ -1,9 +1,11 @@
 package com.github.imdabigboss.kitduels;
 
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import com.github.imdabigboss.kitduels.managers.GameManager;
+import com.github.imdabigboss.kitduels.managers.MapManager;
+import com.github.imdabigboss.kitduels.managers.StatsManager;
+import com.github.imdabigboss.kitduels.util.PlayerUtils;
+import org.bukkit.*;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,7 +29,8 @@ public class EventListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        KitDuels.sendToSpawn(player);
+        GameManager.sendToSpawn(player);
+        PlayerUtils.registerPlayer(player);
     }
 
     @EventHandler
@@ -47,6 +50,11 @@ public class EventListener implements Listener {
         if (KitDuels.playerMaps.containsKey(player)) {
             String map = KitDuels.playerMaps.get(player);
             if (KitDuels.ongoingMaps.contains(map)) {
+                if (event.getCause().equals(EntityDamageEvent.DamageCause.LIGHTNING)) {
+                    event.setCancelled(true);
+                    return;
+                }
+
                 if (player.getHealth() - event.getFinalDamage() <= 0) {
                     event.setCancelled(true);
                     player.setHealth(20);
@@ -57,6 +65,11 @@ public class EventListener implements Listener {
                             player.setGameMode(GameMode.SPECTATOR);
                         }
                     }, 20L);
+
+                    World world = plugin.getServer().getWorld(map);
+                    if (world != null) {
+                        world.strikeLightning(player.getLocation());
+                    }
 
                     for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
                         mapPlayer.sendMessage(player.getDisplayName() + ChatColor.GREEN + " was killed!");
@@ -78,6 +91,7 @@ public class EventListener implements Listener {
                             if (mapPlayer == winPlayer) {
                                 mapPlayer.sendTitle(ChatColor.GOLD + "VICTORY!", "You won the game", 0, 60, 10);
                                 mapPlayer.setGameMode(GameMode.ADVENTURE);
+                                StatsManager.addPlayerWin(mapPlayer);
                             } else {
                                 mapPlayer.sendTitle(ChatColor.RED + "DEFEAT!", winPlayer.getDisplayName() + ChatColor.GREEN + " won the game", 0, 60, 10);
                                 mapPlayer.setGameMode(GameMode.SPECTATOR);
@@ -119,7 +133,7 @@ public class EventListener implements Listener {
 
         ItemStack item = player.getInventory().getItem(EquipmentSlot.HAND);
         if (item.getType() == Material.CHEST) {
-            KitDuels.openKitSelectGUIPlayer(player);
+            GameManager.openKitSelectGUIPlayer(player);
         } else if (item.getType() == Material.RED_DYE) {
             MapManager.removePlayerFromMap(player);
         }

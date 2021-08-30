@@ -1,20 +1,15 @@
 package com.github.imdabigboss.kitduels;
 
 import com.github.imdabigboss.kitduels.commands.*;
-import com.github.imdabigboss.kitduels.util.InventorySerialization;
 
-import de.themoep.inventorygui.GuiElementGroup;
-import de.themoep.inventorygui.GuiPageElement;
-import de.themoep.inventorygui.InventoryGui;
-import de.themoep.inventorygui.StaticGuiElement;
+import com.github.imdabigboss.kitduels.managers.HologramManager;
+import com.github.imdabigboss.kitduels.managers.MapManager;
+import com.github.imdabigboss.kitduels.managers.StatsManager;
+import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -23,6 +18,8 @@ public final class KitDuels extends JavaPlugin {
     private static KitDuels instance = null;
     private static YMLUtils mapsYML = null;
     private static YMLUtils kitsYML = null;
+    private static YMLUtils statsYML = null;
+    private static boolean hologramsEnabled = false;
 
     public static Map<Player, String> editModePlayers = new HashMap<>();
 
@@ -48,18 +45,20 @@ public final class KitDuels extends JavaPlugin {
                 List<String> maps = this.getConfig().getStringList("allMaps");
                 for (String map : maps) {
                     WorldCreator wc = new WorldCreator(map);
-                    wc.generator("VoidGenerator");
+                    wc.generator("VoidGen");
                     wc.type(WorldType.NORMAL);
-                    wc.createWorld();
+                    World world = wc.createWorld();
+                    MapManager.setMapGameRules(world);
                     allMaps.add(map);
                 }
             }
         }
 
-        log.info(String.format("[%s] Finishing setup...", getDescription().getName(), getDescription().getVersion()));
+        log.info(String.format("[%s] Finishing setup...", getDescription().getName()));
 
         mapsYML = new YMLUtils("maps.yml");
         kitsYML = new YMLUtils("kits.yml");
+        statsYML = new YMLUtils("stats.yml");
 
         getServer().getPluginManager().registerEvents(new EventListener(this), this);
 
@@ -79,6 +78,21 @@ public final class KitDuels extends JavaPlugin {
             }
         }
 
+        StatsManager.loadStats();
+
+        if (!getServer().getPluginManager().isPluginEnabled("HolographicDisplays")) {
+            log.warning(String.format("[%s] HolographicDisplays is not installed or enabled on this server! If you want holograms, please add it to your plugins.", getDescription().getName()));
+        } else {
+            hologramsEnabled = true;
+            HologramManager.registerPlaceholders();
+            if (this.getConfig().contains("hologramPos")) {
+                Location location = this.getConfig().getLocation("hologramPos");
+                if (location != null) {
+                    HologramManager.updateHolo(location);
+                }
+            }
+        }
+
         this.getCommand("kd").setExecutor(new KitDuelsCommand(this));
         this.getCommand("kdkits").setExecutor(new KitDuelsKitsCommand(this));
         this.getCommand("joingame").setExecutor(new JoinGameCommand(this));
@@ -91,94 +105,11 @@ public final class KitDuels extends JavaPlugin {
     @Override
     public void onDisable() {
         log.info(String.format("[%s] Disabled Version %s", getDescription().getName(), getDescription().getVersion()));
-    }
 
-    public static void sendToSpawn(Player player) {
-        if (instance.getConfig().contains("lobbySpawn")) {
-            Location location = (Location) instance.getConfig().get("lobbySpawn");
-            player.teleport(location);
-        } else {
-            Location location = instance.getServer().getWorld("world").getSpawnLocation();
-            player.teleport(location);
+        if (hologramsEnabled) {
+            HologramsAPI.unregisterPlaceholders(this);
+            HologramManager.deleteAllHolos();
         }
-
-        player.setGameMode(GameMode.ADVENTURE);
-        player.getInventory().clear();
-    }
-
-    public static boolean loadKitToPlayer(Player player, String kitName) {
-        player.getInventory().clear();
-
-        Inventory content;
-        ItemStack[] armor;
-
-        try {
-            content = InventorySerialization.fromBase64(kitsYML.getConfig().getString(kitName + ".content"));
-            armor = InventorySerialization.itemStackArrayFromBase64(kitsYML.getConfig().getString(kitName + ".armor"));
-        } catch (IOException e) {
-            return false;
-        }
-
-        player.getInventory().setContents(content.getContents());
-        player.getInventory().setArmorContents(armor);
-        return true;
-    }
-
-    public static void openKitSelectGUIPlayer(Player player) {
-        String[] kitLayout = {
-                "    a    ",
-                "ggggggggg",
-                "ggggggggg",
-                "ggggggggg",
-                "b   h   f"
-        };
-
-        InventoryGui inventoryGui = new InventoryGui(instance, player, "Kit select", kitLayout);
-
-        GuiElementGroup group = new GuiElementGroup('g');
-        for (String kit : allKits) {
-            ItemStack item = new ItemStack(Material.ENDER_CHEST);
-            ItemMeta meta = item.getItemMeta();
-            meta.setDisplayName(kit);
-            item.setItemMeta(meta);
-
-            group.addElement(new StaticGuiElement('e', item, click -> {
-                inventoryGui.playClickSound();
-                String kitName = click.getEvent().getCurrentItem().getItemMeta().getDisplayName();
-                playerKits.remove(player);
-                playerKits.put(player, kitName);
-                player.sendMessage(ChatColor.AQUA + "Set your kit to " + kitName);
-                inventoryGui.close();
-                return true;
-            }));
-        }
-
-        ItemStack item = new ItemStack(Material.CYAN_SHULKER_BOX);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("Random kit");
-        item.setItemMeta(meta);
-
-        group.addElement(new StaticGuiElement('e', item, click -> {
-            inventoryGui.playClickSound();
-            playerKits.remove(player);
-            player.sendMessage(ChatColor.AQUA + "Your kit is now random");
-            inventoryGui.close();
-            return true;
-        }));
-        inventoryGui.addElement(group);
-
-        inventoryGui.addElement(new GuiPageElement('b', new ItemStack(Material.ARROW), GuiPageElement.PageAction.PREVIOUS, "Go to previous page (%prevpage%)"));
-        inventoryGui.addElement(new GuiPageElement('f', new ItemStack(Material.ARROW), GuiPageElement.PageAction.NEXT, "Go to next page (%nextpage%)"));
-
-        inventoryGui.addElement(new StaticGuiElement('a', new ItemStack(Material.CHEST), "Kit select"));
-        inventoryGui.addElement(new StaticGuiElement('h', new ItemStack(Material.PAPER), click -> {
-            inventoryGui.playClickSound();
-            inventoryGui.close();
-            return true;
-        }, "Close"));
-        inventoryGui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
-
-        inventoryGui.show(player, true);
     }
 
     public static Logger getLog() {
@@ -192,5 +123,11 @@ public final class KitDuels extends JavaPlugin {
     }
     public static YMLUtils getKitsYML() {
         return kitsYML;
+    }
+    public static YMLUtils getStatsYML() {
+        return statsYML;
+    }
+    public static boolean getHologramsEnabled() {
+        return hologramsEnabled;
     }
 }

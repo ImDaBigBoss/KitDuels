@@ -1,5 +1,6 @@
-package com.github.imdabigboss.kitduels;
+package com.github.imdabigboss.kitduels.managers;
 
+import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.util.CountdownTimer;
 import com.github.imdabigboss.kitduels.util.EntityUtils;
 import com.github.imdabigboss.kitduels.util.WorldEditUtils;
@@ -20,7 +21,7 @@ public class MapManager {
         wc.generator("VoidGenerator");
         wc.type(WorldType.NORMAL);
         World out = wc.createWorld();
-        //TODO: Set game rules
+        setMapGameRules(out);
         KitDuels.allMaps.add(name);
         KitDuels.getInstance().getConfig().set("allMaps", KitDuels.allMaps);
         KitDuels.getInstance().saveConfig();
@@ -180,7 +181,7 @@ public class MapManager {
                     for (PotionEffect effect : player.getActivePotionEffects()) {
                         player.removePotionEffect(effect.getType());
                     }
-                    KitDuels.sendToSpawn(player);
+                    GameManager.sendToSpawn(player);
                     player.sendMessage("You left the map");
                 }
 
@@ -193,7 +194,7 @@ public class MapManager {
 
                     if (player.isOnline()) {
                         player.sendMessage("You left the map");
-                        KitDuels.sendToSpawn(player);
+                        GameManager.sendToSpawn(player);
                     }
                 }
             }
@@ -234,7 +235,7 @@ public class MapManager {
                     int index = new Random().nextInt(KitDuels.allKits.size());
                     kitName = KitDuels.allKits.get(index);
                 }
-                KitDuels.loadKitToPlayer(mapPlayer, kitName);
+                GameManager.loadKitToPlayer(mapPlayer, kitName);
                 mapPlayer.sendMessage(ChatColor.GREEN + "You got the " + ChatColor.GOLD + kitName + ChatColor.GREEN + " kit!");
             } else {
                 if (mapPlayer.isOp()) {
@@ -265,7 +266,7 @@ public class MapManager {
             for (PotionEffect effect : player.getActivePotionEffects()) {
                 player.removePotionEffect(effect.getType());
             }
-            KitDuels.sendToSpawn(player);
+            GameManager.sendToSpawn(player);
             KitDuels.playerMaps.remove(player);
         }
 
@@ -281,5 +282,15 @@ public class MapManager {
         EntityUtils.killEntities(pos1, pos2);
 
         KitDuels.inUseMaps.remove(map);
+    }
+
+    public static void setMapGameRules(World world) {
+        world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+        world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+        world.setGameRule(GameRule.DISABLE_RAIDS, true);
+        world.setGameRule(GameRule.DO_FIRE_TICK, false);
+        world.setGameRule(GameRule.KEEP_INVENTORY, false);
     }
 }

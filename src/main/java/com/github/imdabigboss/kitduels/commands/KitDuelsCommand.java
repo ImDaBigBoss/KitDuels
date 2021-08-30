@@ -1,7 +1,9 @@
 package com.github.imdabigboss.kitduels.commands;
 
+import com.github.imdabigboss.kitduels.managers.GameManager;
 import com.github.imdabigboss.kitduels.KitDuels;
-import com.github.imdabigboss.kitduels.MapManager;
+import com.github.imdabigboss.kitduels.managers.HologramManager;
+import com.github.imdabigboss.kitduels.managers.MapManager;
 import com.github.imdabigboss.kitduels.YMLUtils;
 import com.github.imdabigboss.kitduels.util.WorldEditUtils;
 import com.github.imdabigboss.kitduels.util.WorldUtils;
@@ -66,7 +68,7 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                         if (sender instanceof Player) {
                             Player player = (Player) sender;
                             KitDuels.editModePlayers.remove(player);
-                            KitDuels.sendToSpawn(player);
+                            GameManager.sendToSpawn(player);
                         }
                         KitDuels.inUseMaps.remove(args[1]);
                         KitDuels.enabledMaps.remove(args[1]);
@@ -185,7 +187,7 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
 
                 KitDuels.inUseMaps.remove(worldName);
                 KitDuels.editModePlayers.remove(player);
-                KitDuels.sendToSpawn(player);
+                GameManager.sendToSpawn(player);
                 sender.sendMessage(ChatColor.AQUA + "Map saved! You have exited edit mode.");
             } else if (args[0].equals("edit")) {
                 if (args.length == 2) {
@@ -246,10 +248,14 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
             } else if (args[0].equals("enable")) {
                 if (args.length == 2) {
                     if (!KitDuels.enabledMaps.containsKey(args[1])) {
-                        KitDuels.enabledMaps.put(args[1], new ArrayList<>());
-                        List<String> keys = new ArrayList<>(KitDuels.enabledMaps.keySet());
-                        plugin.getConfig().set("enabledMaps", keys);
-                        sender.sendMessage(ChatColor.AQUA + "The map has been enabled!");
+                        if (!KitDuels.allMaps.contains(args[1])) {
+                            KitDuels.enabledMaps.put(args[1], new ArrayList<>());
+                            List<String> keys = new ArrayList<>(KitDuels.enabledMaps.keySet());
+                            plugin.getConfig().set("enabledMaps", keys);
+                            sender.sendMessage(ChatColor.AQUA + "The map has been enabled!");
+                        } else {
+                            sender.sendMessage(ChatColor.RED + "That map does not exist!");
+                        }
                     } else {
                         sender.sendMessage(ChatColor.RED + "That map is already enabled!");
                     }
@@ -284,6 +290,23 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
 
                 mapsYML.getConfig().set(playerMap + "." + args[0], player.getLocation());
                 sender.sendMessage(ChatColor.AQUA + "You have set " + args[0] + " here!");
+            } else if (args[0].equalsIgnoreCase("setHolo")) {
+                if (!KitDuels.getHologramsEnabled()) {
+                    sender.sendMessage(ChatColor.RED + "Holograms are not enabled, please add the HolographicDisplays plugin.");
+                    return true;
+                }
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(ChatColor.RED + "You must be a player to add holograms!");
+                    return true;
+                }
+                Player player = (Player) sender;
+                HologramManager.updateHolo(player.getLocation());
+                plugin.getConfig().set("hologramPos", player.getLocation());
+                sender.sendMessage(ChatColor.AQUA + "You have set the hologram position.");
+            } else if (args[0].equalsIgnoreCase("delHolo")) {
+                HologramManager.deleteAllHolos();
+                plugin.getConfig().set("hologramPos", null);
+                sender.sendMessage(ChatColor.AQUA + "You have removed the hologram.");
             } else {
                 sendHelp(sender);
             }
@@ -314,6 +337,8 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
             cmds.add("disable");
             cmds.add("pos1");
             cmds.add("pos2");
+            cmds.add("setHolo");
+            cmds.add("delHolo");
 
         } else if (args.length == 2) {
             if (args[0].equals("edit") || args[0].equals("delete") || args[0].equals("enable") || args[0].equals("disable")) {

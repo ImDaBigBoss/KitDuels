@@ -1,7 +1,7 @@
 package com.github.imdabigboss.kitduels.commands;
 
+import com.github.imdabigboss.kitduels.managers.GameManager;
 import com.github.imdabigboss.kitduels.KitDuels;
-import com.github.imdabigboss.kitduels.YMLUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -9,7 +9,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.mozilla.javascript.Kit;
 
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class KitSelectCommand implements CommandExecutor, TabExecutor {
         }
         Player player = (Player) sender;
         if (args.length != 1) {
-            KitDuels.openKitSelectGUIPlayer(player);
+            GameManager.openKitSelectGUIPlayer(player);
             return true;
         }
 
