@@ -18,7 +18,7 @@ import java.util.Random;
 public class MapManager {
     public static void createMap(String name) {
         WorldCreator wc = new WorldCreator(name);
-        wc.generator("VoidGenerator");
+        wc.generator("VoidGen");
         wc.type(WorldType.NORMAL);
         World out = wc.createWorld();
         setMapGameRules(out);
@@ -222,6 +222,7 @@ public class MapManager {
             mapPlayer.setHealth(20);
             mapPlayer.setFoodLevel(20);
             mapPlayer.getInventory().clear();
+            mapPlayer.setFireTicks(0);
 
             mapPlayer.sendMessage("Go, go, go!");
             mapPlayer.sendTitle(ChatColor.RED + "Fight!", " ", 0, 10, 10);
@@ -263,6 +264,7 @@ public class MapManager {
 
             player.setHealth(20);
             player.setFoodLevel(20);
+            player.setFireTicks(0);
             for (PotionEffect effect : player.getActivePotionEffects()) {
                 player.removePotionEffect(effect.getType());
             }

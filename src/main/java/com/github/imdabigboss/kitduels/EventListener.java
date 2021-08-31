@@ -5,7 +5,6 @@ import com.github.imdabigboss.kitduels.managers.MapManager;
 import com.github.imdabigboss.kitduels.managers.StatsManager;
 import com.github.imdabigboss.kitduels.util.PlayerUtils;
 import org.bukkit.*;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

@@ -84,6 +84,10 @@ public final class KitDuels extends JavaPlugin {
             log.warning(String.format("[%s] HolographicDisplays is not installed or enabled on this server! If you want holograms, please add it to your plugins.", getDescription().getName()));
         } else {
             hologramsEnabled = true;
+            if (this.getConfig().contains("leaderboardLines")) {
+                HologramManager.leaderboardLines = this.getConfig().getInt("leaderboardLines");
+            }
+
             HologramManager.registerPlaceholders();
             if (this.getConfig().contains("hologramPos")) {
                 Location location = this.getConfig().getLocation("hologramPos");

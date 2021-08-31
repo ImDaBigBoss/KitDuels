@@ -70,9 +70,9 @@ public class StatsManager {
     public static String getStatLine(int line) {
         if (StatsManager.playerRankings.containsKey(line)) {
             String player = StatsManager.playerRankings.get(line);
-            return player + " " + ChatColor.AQUA + StatsManager.playerWins.get(player);
+            return line + ". " + player + " " + ChatColor.AQUA + StatsManager.playerWins.get(player);
         } else {
-            return "No data available";
+            return line + ". No data available";
         }
     }
 }
