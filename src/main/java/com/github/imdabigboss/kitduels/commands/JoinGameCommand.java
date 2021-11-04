@@ -79,6 +79,7 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
                     lore.add("MAP IS IN USE!");
                     item.setType(Material.RED_TERRACOTTA);
                 }
+                lore.add(KitDuels.enabledMaps.get(map).size() + " playing");
                 meta.setLore(lore);
                 item.setItemMeta(meta);
 

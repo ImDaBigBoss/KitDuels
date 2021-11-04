@@ -1,1 +1,7 @@
 leaderboardLines: 5
+
+disableDamageWhenNotInGame: true
+disableDamageInSelectWorlds: true
+lobbyWorlds:
+  - world
+  - lobby

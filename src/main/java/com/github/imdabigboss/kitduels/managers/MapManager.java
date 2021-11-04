@@ -159,6 +159,9 @@ public class MapManager {
     public static boolean removePlayerFromMap(Player player) {
         if (KitDuels.playerMaps.containsKey(player)) {
             String map = KitDuels.playerMaps.get(player);
+            if (KitDuels.inUseMaps.contains(map) && !KitDuels.ongoingMaps.contains(map)) {
+                return false;
+            }
 
             KitDuels.enabledMaps.get(map).remove(player);
             KitDuels.playerMaps.remove(player);

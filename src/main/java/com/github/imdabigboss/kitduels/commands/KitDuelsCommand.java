@@ -248,7 +248,7 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
             } else if (args[0].equals("enable")) {
                 if (args.length == 2) {
                     if (!KitDuels.enabledMaps.containsKey(args[1])) {
-                        if (!KitDuels.allMaps.contains(args[1])) {
+                        if (KitDuels.allMaps.contains(args[1])) {
                             KitDuels.enabledMaps.put(args[1], new ArrayList<>());
                             List<String> keys = new ArrayList<>(KitDuels.enabledMaps.keySet());
                             plugin.getConfig().set("enabledMaps", keys);

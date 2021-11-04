@@ -33,6 +33,10 @@ public final class KitDuels extends JavaPlugin {
     public static List<String> allKits = new ArrayList<>();
     public static Map<Player, String> playerKits = new HashMap<>();
 
+    public static boolean disableDamageWhenNotInGame = true;
+    public static boolean disableDamageInSelectWorlds = true;
+    public static List<String> lobbyWorlds = new ArrayList<>();
+
     @Override
     public void onEnable() {
         instance = this;
@@ -93,6 +97,24 @@ public final class KitDuels extends JavaPlugin {
                 Location location = this.getConfig().getLocation("hologramPos");
                 if (location != null) {
                     HologramManager.updateHolo(location);
+                }
+            }
+        }
+
+        if (this.getConfig().contains("disableDamageWhenNotInGame")) {
+            disableDamageWhenNotInGame = this.getConfig().getBoolean("disableDamageWhenNotInGame");
+
+            if (disableDamageWhenNotInGame) {
+                if (this.getConfig().contains("disableDamageInSelectWorlds")) {
+                    disableDamageInSelectWorlds = this.getConfig().getBoolean("disableDamageInSelectWorlds");
+                }
+
+                if (disableDamageInSelectWorlds) {
+                    if (this.getConfig().contains("lobbyWorlds")) {
+                        if (this.getConfig().get("lobbyWorlds") != null) {
+                            lobbyWorlds = this.getConfig().getStringList("lobbyWorlds");
+                        }
+                    }
                 }
             }
         }

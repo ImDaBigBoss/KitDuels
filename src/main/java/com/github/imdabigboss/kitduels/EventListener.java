@@ -108,7 +108,15 @@ public class EventListener implements Listener {
                 event.setCancelled(true);
             }
         } else {
-            event.setCancelled(true);
+            if (KitDuels.disableDamageWhenNotInGame) {
+                if (KitDuels.disableDamageInSelectWorlds) {
+                    if (KitDuels.lobbyWorlds.contains(player.getWorld().getName())) {
+                        event.setCancelled(true);
+                    }
+                } else {
+                    event.setCancelled(true);
+                }
+            }
         }
     }
 
