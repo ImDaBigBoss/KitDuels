@@ -5,10 +5,10 @@ import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.managers.HologramManager;
 import com.github.imdabigboss.kitduels.managers.MapManager;
 import com.github.imdabigboss.kitduels.YMLUtils;
+import com.github.imdabigboss.kitduels.managers.TextManager;
 import com.github.imdabigboss.kitduels.util.WorldEditUtils;
 import com.github.imdabigboss.kitduels.util.WorldUtils;
 
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -25,11 +25,13 @@ import java.util.Set;
 public class KitDuelsCommand implements CommandExecutor, TabExecutor {
     private KitDuels plugin;
     private YMLUtils mapsYML;
+    private TextManager textManager;
 
     public KitDuelsCommand(KitDuels plugin) {
         super();
         this.plugin = plugin;
         this.mapsYML = KitDuels.getMapsYML();
+        this.textManager = KitDuels.getTextManager();
     }
 
     @Override
@@ -41,23 +43,23 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                 if (args.length == 2) {
                     if (!mapsYML.getConfig().contains(args[1] + ".world")) {
                         if (!(sender instanceof Player)) {
-                            sender.sendMessage(ChatColor.RED + "You must be a player to add maps!");
+                            sender.sendMessage(textManager.get("general.errors.notPlayer"));
                             return true;
                         }
                         Player player = (Player) sender;
 
-                        sender.sendMessage(ChatColor.AQUA + "Creating world...");
+                        sender.sendMessage(textManager.get("general.info.creatingWorld"));
                         MapManager.createMap(args[1]);
-                        sender.sendMessage(ChatColor.AQUA + "Done!");
+                        sender.sendMessage(textManager.get("general.info.done"));
                         player.setGameMode(GameMode.CREATIVE);
                         player.teleport(KitDuels.getInstance().getServer().getWorld(args[1]).getSpawnLocation());
 
                         KitDuels.editModePlayers.put(player, args[1]);
-                        KitDuels.inUseMaps.add(args[1]);
+                        KitDuels.inUseMaps.put(args[1], 0);
                         mapsYML.getConfig().set(args[1] + ".world", player.getLocation());
-                        sender.sendMessage("The map was added! Please use the following commands to finish the map setup: " + ChatColor.GOLD + "/kd maxPlayers <number>" + ChatColor.RESET + ", " + ChatColor.GOLD + "/kd spawn <number>" + ChatColor.RESET + ", " + ChatColor.GOLD + "/kd pos1" + ChatColor.RESET + " and " + ChatColor.GOLD + "/kd pos2" + ChatColor.RESET + ". Then enable the map: " + ChatColor.GOLD + "/kd enable <name>");
+                        sender.sendMessage(textManager.get("general.info.mapAdded"));
                     } else {
-                        sender.sendMessage(ChatColor.RED + "That map already exists!");
+                        sender.sendMessage(textManager.get("general.errors.mapAlreadyExists"));
                     }
                 } else {
                     sendHelp(sender);
@@ -86,22 +88,22 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                         WorldUtils.unloadWorld(world);
                         WorldUtils.deleteWorld(world.getWorldFolder());
 
-                        sender.sendMessage(ChatColor.AQUA + "The map was deleted.");
+                        sender.sendMessage(textManager.get("general.info.mapDeleted"));
                     } else {
-                        sender.sendMessage(ChatColor.RED + "That map does not exist!");
+                        sender.sendMessage(textManager.get("general.error.notAMap"));
                     }
                 } else {
                     sendHelp(sender);
                 }
             } else if (args[0].equals("maxPlayers")) {
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED + "You must be a player to use this command!");
+                    sender.sendMessage(textManager.get("general.errors.notPlayer"));
                     return true;
                 }
 
                 Player player = (Player) sender;
                 if (!KitDuels.editModePlayers.containsKey(player)) {
-                    sender.sendMessage(ChatColor.RED + "You are not editing any map!");
+                    sender.sendMessage(textManager.get("general.errors.notEditingMap"));
                     return true;
                 }
 
@@ -109,27 +111,27 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                     try {
                         int num = Integer.parseInt(args[1]);
                         if (num < 2) {
-                            sender.sendMessage(ChatColor.RED + "A map can't have less than 2 players!");
+                            sender.sendMessage(textManager.get("general.errors.lessThanTwoPlayers"));
                             return true;
                         }
 
                         mapsYML.getConfig().set(KitDuels.editModePlayers.get(player) + ".maxPlayers", num);
-                        sender.sendMessage(ChatColor.AQUA + "You set the max number of players to " + num + " for this map!");
+                        sender.sendMessage(textManager.get("general.info.maxPlayersSet", num));
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "That is not a number!");
+                        sender.sendMessage(textManager.get("general.errors.notANum"));
                     }
                 } else {
                     sendHelp(sender);
                 }
             } else if (args[0].equals("spawn")) {
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED + "You must be a player to use this command!");
+                    sender.sendMessage(textManager.get("general.errors.notPlayer"));
                     return true;
                 }
 
                 Player player = (Player) sender;
                 if (!KitDuels.editModePlayers.containsKey(player)) {
-                    sender.sendMessage(ChatColor.RED + "You are not editing any map!");
+                    sender.sendMessage(textManager.get("general.errors.notEditingMap"));
                     return true;
                 }
 
@@ -140,45 +142,45 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                         try {
                             int num = Integer.parseInt(args[1]);
                             if (num <= 0) {
-                                sender.sendMessage(ChatColor.RED + "You can't set a negative or null number as a spawn point!");
+                                sender.sendMessage(textManager.get("general.errors.negativeOrNullNumber"));
                                 return true;
                             }
                             if (num > maxnum) {
-                                sender.sendMessage(ChatColor.RED + "You set your max number of players to " + maxnum);
+                                sender.sendMessage(textManager.get("general.info.maxPlayersSet", maxnum));
                                 return true;
                             }
 
                             mapsYML.getConfig().set(KitDuels.editModePlayers.get(player) + ".spawn" + num, player.getLocation());
-                            sender.sendMessage(ChatColor.AQUA + "You set the spawn point number " + num + " out of " + maxnum);
+                            sender.sendMessage(textManager.get("general.info.spawnPointSet", num, maxnum));
                         } catch (NumberFormatException e) {
-                            sender.sendMessage(ChatColor.RED + "That is not a number!");
+                            sender.sendMessage(textManager.get("general.errors.notANum"));
                         }
                     } else {
-                        sender.sendMessage(ChatColor.RED + "You need to have set a max number of players to run this.");
+                        sender.sendMessage(textManager.get("general.errors.maxPlayersNotSet"));
                     }
                 } else {
                     sendHelp(sender);
                 }
             } else if (args[0].equals("save")) {
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED + "You must be a player to use this command!");
+                    sender.sendMessage(textManager.get("general.errors.notPlayer"));
                     return true;
                 }
 
                 Player player = (Player) sender;
                 if (!KitDuels.editModePlayers.containsKey(player)) {
-                    sender.sendMessage(ChatColor.RED + "You are not editing any map!");
+                    sender.sendMessage(textManager.get("general.errors.notEditingMap"));
                     return true;
                 }
 
                 String worldName = KitDuels.editModePlayers.get(player);
 
                 if (!(mapsYML.getConfig().contains(worldName + ".pos1") && mapsYML.getConfig().contains(worldName + ".pos2"))) {
-                    sender.sendMessage(ChatColor.RED + "Your map must have pos1 and pos2 set to save!");
+                    sender.sendMessage(textManager.get("general.errors.resetPosNotSet"));
                     return true;
                 }
 
-                sender.sendMessage(ChatColor.AQUA + "Map is saving...");
+                sender.sendMessage(textManager.get("general.info.mapSaving"));
 
                 Location pos1 = mapsYML.getConfig().getLocation(worldName + ".pos1");
                 Location pos2 = mapsYML.getConfig().getLocation(worldName + ".pos2");
@@ -188,21 +190,21 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                 KitDuels.inUseMaps.remove(worldName);
                 KitDuels.editModePlayers.remove(player);
                 GameManager.sendToSpawn(player);
-                sender.sendMessage(ChatColor.AQUA + "Map saved! You have exited edit mode.");
+                sender.sendMessage(textManager.get("general.info.mapSaved"));
             } else if (args[0].equals("edit")) {
                 if (args.length == 2) {
                     if (mapsYML.getConfig().contains(args[1] + ".world")) {
                         if (!(sender instanceof Player)) {
-                            sender.sendMessage(ChatColor.RED + "You must be a player to add maps!");
+                            sender.sendMessage(textManager.get("general.errors.notPlayer"));
                             return true;
                         }
-                        if (KitDuels.inUseMaps.contains(args[1])) {
-                            sender.sendMessage(ChatColor.RED + "The map is in use! Be careful");
+                        if (KitDuels.inUseMaps.containsKey(args[1])) {
+                            sender.sendMessage(textManager.get("general.warning.mapInUse"));
                         }
                         Player player = (Player) sender;
 
-                        sender.sendMessage(ChatColor.AQUA + "Map is loading...");
-                        KitDuels.inUseMaps.add(args[1]);
+                        sender.sendMessage(textManager.get("general.info.mapLoading"));
+                        KitDuels.inUseMaps.put(args[1], 0);
                         KitDuels.editModePlayers.put(player, args[1]);
 
                         if (mapsYML.getConfig().contains(args[1] + ".pos1") && mapsYML.getConfig().contains(args[1] + ".pos2")) {
@@ -216,32 +218,32 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                         player.setGameMode(GameMode.CREATIVE);
                         player.setFlying(true);
                         player.getInventory().clear();
-                        sender.sendMessage(ChatColor.AQUA + "You are now editing " + args[1] + "!");
+                        sender.sendMessage(textManager.get("general.info.mapLoaded", args[1]));
                     } else {
-                        sender.sendMessage(ChatColor.RED + "That map does not exist!");
+                        sender.sendMessage(textManager.get("general.errors.notAMap"));
                     }
                 } else {
                     sendHelp(sender);
                 }
             } else if (args[0].equals("lobbySpawn")) {
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED + "You must be a player to use this command!");
+                    sender.sendMessage(textManager.get("general.errors.notPlayer"));
                     return true;
                 }
 
                 Player player = (Player) sender;
                 plugin.getConfig().set("lobbySpawn", player.getLocation());
-                sender.sendMessage(ChatColor.AQUA + "You have set the lobby spawn position here!");
+                sender.sendMessage(textManager.get("general.info.lobbySpawnSet"));
             } else if (args[0].equals("list")) {
                 Set<String> keys = mapsYML.getConfig().getKeys(false);
-                String maps = "The existing maps are:";
+                String maps = textManager.get("general.info.mapList.header");
                 for (String key : keys) {
                     int max = MapManager.getMapMaxPlayers(key);
-                    maps += "\n - " + key + " " + max + " players";
+                    maps += "\n " + textManager.get("general.info.mapList.line", key, max);
                     if (KitDuels.enabledMaps.containsKey(key)) {
-                        maps += ChatColor.GREEN + " ENABLED" + ChatColor.RESET;
+                        maps += textManager.get("general.info.mapList.enabled");
                     } else {
-                        maps += ChatColor.RED + " DISABLED" + ChatColor.RESET;
+                        maps += textManager.get("general.info.mapList.disabled");
                     }
                 }
                 sender.sendMessage(maps);
@@ -252,12 +254,12 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                             KitDuels.enabledMaps.put(args[1], new ArrayList<>());
                             List<String> keys = new ArrayList<>(KitDuels.enabledMaps.keySet());
                             plugin.getConfig().set("enabledMaps", keys);
-                            sender.sendMessage(ChatColor.AQUA + "The map has been enabled!");
+                            sender.sendMessage(textManager.get("general.info.mapEnabled"));
                         } else {
-                            sender.sendMessage(ChatColor.RED + "That map does not exist!");
+                            sender.sendMessage(textManager.get("general.errors.notAMap"));
                         }
                     } else {
-                        sender.sendMessage(ChatColor.RED + "That map is already enabled!");
+                        sender.sendMessage(textManager.get("general.errors.mapAlreadyEnabled"));
                     }
                 } else {
                     sendHelp(sender);
@@ -268,45 +270,45 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                         KitDuels.enabledMaps.remove(args[1]);
                         List<String> keys = new ArrayList<>(KitDuels.enabledMaps.keySet());
                         plugin.getConfig().set("enabledMaps", keys);
-                        sender.sendMessage(ChatColor.AQUA + "The map has been disabled!");
+                        sender.sendMessage(textManager.get("general.info.mapDisabled"));
                     } else {
-                        sender.sendMessage(ChatColor.RED + "That map is not enabled!");
+                        sender.sendMessage(textManager.get("general.errors.mapNotEnabled"));
                     }
                 } else {
                     sendHelp(sender);
                 }
             } else if (args[0].equals("pos1") || args[0].equals("pos2")) {
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED + "You must be a player to use this command!");
+                    sender.sendMessage(textManager.get("general.errors.notPlayer"));
                     return true;
                 }
 
                 Player player = (Player) sender;
                 if (!KitDuels.editModePlayers.containsKey(player)) {
-                    sender.sendMessage(ChatColor.RED + "You are not editing any map!");
+                    sender.sendMessage(textManager.get("general.errors.notEditingMap"));
                     return true;
                 }
                 String playerMap = KitDuels.editModePlayers.get(player);
 
                 mapsYML.getConfig().set(playerMap + "." + args[0], player.getLocation());
-                sender.sendMessage(ChatColor.AQUA + "You have set " + args[0] + " here!");
+                sender.sendMessage(textManager.get("general.info.resetPosSet", args[0]));
             } else if (args[0].equalsIgnoreCase("setHolo")) {
                 if (!KitDuels.getHologramsEnabled()) {
-                    sender.sendMessage(ChatColor.RED + "Holograms are not enabled, please add the HolographicDisplays plugin.");
+                    sender.sendMessage(textManager.get("general.errors.hologramsNotEnabled"));
                     return true;
                 }
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED + "You must be a player to add holograms!");
+                    sender.sendMessage(textManager.get("general.errors.notPlayer"));
                     return true;
                 }
                 Player player = (Player) sender;
                 HologramManager.updateHolo(player.getLocation());
                 plugin.getConfig().set("hologramPos", player.getLocation());
-                sender.sendMessage(ChatColor.AQUA + "You have set the hologram position.");
+                sender.sendMessage(textManager.get("general.info.hologramPosSet"));
             } else if (args[0].equalsIgnoreCase("delHolo")) {
                 HologramManager.deleteAllHolos();
                 plugin.getConfig().set("hologramPos", null);
-                sender.sendMessage(ChatColor.AQUA + "You have removed the hologram.");
+                sender.sendMessage(textManager.get("general.info.hologramRemoved"));
             } else {
                 sendHelp(sender);
             }
@@ -318,7 +320,7 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
     }
 
     public void sendHelp(CommandSender sender) {
-        sender.sendMessage("The correct usage is:\n - create <name>\n - delete <name>\n - maxPlayers <number>\n - spawn <number>\n - save\n - edit <name>\n - lobbySpawn\n - list\n - enable <name>\n - disable <name>\n - pos1\n - pos2");
+        sender.sendMessage("The correct usage is:\n - create <name>\n - delete <name>\n - maxPlayers <number>\n - spawn <number>\n - save\n - edit <name>\n - lobbySpawn\n - list\n - enable <name>\n - disable <name>\n - pos1\n - pos2\n - setHolo\n - delHolo");
     }
 
     @Override

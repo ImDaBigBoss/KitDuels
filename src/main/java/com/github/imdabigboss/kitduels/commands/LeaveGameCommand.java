@@ -3,6 +3,7 @@ package com.github.imdabigboss.kitduels.commands;
 import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.managers.MapManager;
 
+import com.github.imdabigboss.kitduels.managers.TextManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,24 +15,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LeaveGameCommand implements CommandExecutor, TabExecutor {
-    private KitDuels plugin;
+    private TextManager textManager;
 
     public LeaveGameCommand(KitDuels plugin) {
         super();
-        this.plugin = plugin;
+        this.textManager = KitDuels.getTextManager();
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to use this command!");
+            sender.sendMessage(textManager.get("general.errors.notPlayer"));
             return true;
         }
         Player player = (Player) sender;
 
         boolean out = MapManager.removePlayerFromMap(player);
         if (!out) {
-            sender.sendMessage(ChatColor.RED + "You are not in a game!");
+            sender.sendMessage(textManager.get("general.errors.notInGame"));
         }
         return true;
     }

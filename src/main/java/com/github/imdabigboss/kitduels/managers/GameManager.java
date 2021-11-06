@@ -2,10 +2,12 @@ package com.github.imdabigboss.kitduels.managers;
 
 import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.util.InventorySerialization;
+
 import de.themoep.inventorygui.GuiElementGroup;
 import de.themoep.inventorygui.GuiPageElement;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -58,7 +60,7 @@ public class GameManager {
                 "b   h   f"
         };
 
-        InventoryGui inventoryGui = new InventoryGui(KitDuels.getInstance(), player, "Kit select", kitLayout);
+        InventoryGui inventoryGui = new InventoryGui(KitDuels.getInstance(), player, KitDuels.getTextManager().get("ui.titles.kitSelect"), kitLayout);
 
         GuiElementGroup group = new GuiElementGroup('g');
         for (String kit : KitDuels.allKits) {
@@ -72,7 +74,7 @@ public class GameManager {
                 String kitName = click.getEvent().getCurrentItem().getItemMeta().getDisplayName();
                 KitDuels.playerKits.remove(player);
                 KitDuels.playerKits.put(player, kitName);
-                player.sendMessage(ChatColor.AQUA + "Set your kit to " + kitName);
+                player.sendMessage(KitDuels.getTextManager().get("general.info.kitSelected", kitName));
                 inventoryGui.close();
                 return true;
             }));
@@ -80,27 +82,27 @@ public class GameManager {
 
         ItemStack item = new ItemStack(Material.CYAN_SHULKER_BOX);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("Random kit");
+        meta.setDisplayName(KitDuels.getTextManager().get("ui.randomKit"));
         item.setItemMeta(meta);
 
         group.addElement(new StaticGuiElement('e', item, click -> {
             inventoryGui.playClickSound();
             KitDuels.playerKits.remove(player);
-            player.sendMessage(ChatColor.AQUA + "Your kit is now random");
+            player.sendMessage(KitDuels.getTextManager().get("general.info.kitRandomSelected"));
             inventoryGui.close();
             return true;
         }));
         inventoryGui.addElement(group);
 
-        inventoryGui.addElement(new GuiPageElement('b', new ItemStack(Material.ARROW), GuiPageElement.PageAction.PREVIOUS, "Go to previous page (%prevpage%)"));
-        inventoryGui.addElement(new GuiPageElement('f', new ItemStack(Material.ARROW), GuiPageElement.PageAction.NEXT, "Go to next page (%nextpage%)"));
+        inventoryGui.addElement(new GuiPageElement('b', new ItemStack(Material.ARROW), GuiPageElement.PageAction.PREVIOUS, KitDuels.getTextManager().get("ui.buttons.previousPage")));
+        inventoryGui.addElement(new GuiPageElement('f', new ItemStack(Material.ARROW), GuiPageElement.PageAction.NEXT, KitDuels.getTextManager().get("ui.buttons.nextPage")));
 
-        inventoryGui.addElement(new StaticGuiElement('a', new ItemStack(Material.CHEST), "Kit select"));
+        inventoryGui.addElement(new StaticGuiElement('a', new ItemStack(Material.CHEST), KitDuels.getTextManager().get("ui.titles.kitSelect")));
         inventoryGui.addElement(new StaticGuiElement('h', new ItemStack(Material.PAPER), click -> {
             inventoryGui.playClickSound();
             inventoryGui.close();
             return true;
-        }, "Close"));
+        }, KitDuels.getTextManager().get("ui.buttons.close")));
         inventoryGui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
 
         inventoryGui.show(player, true);

@@ -2,13 +2,13 @@ package com.github.imdabigboss.kitduels.commands;
 
 import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.managers.MapManager;
-import com.github.imdabigboss.kitduels.YMLUtils;
 
+import com.github.imdabigboss.kitduels.managers.TextManager;
 import de.themoep.inventorygui.GuiElementGroup;
 import de.themoep.inventorygui.GuiPageElement;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
-import org.bukkit.ChatColor;
+
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -22,27 +22,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JoinGameCommand implements CommandExecutor, TabExecutor {
-    private KitDuels plugin;
-    private YMLUtils mapsYML;
+    private TextManager textManager;
 
     public JoinGameCommand(KitDuels plugin) {
         super();
-        this.plugin = plugin;
-        this.mapsYML = KitDuels.getMapsYML();
+        this.textManager = KitDuels.getTextManager();
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to use this command!");
+            sender.sendMessage(textManager.get("general.errors.notPlayer"));
             return true;
         }
 
         if (KitDuels.editModePlayers.containsKey((Player) sender)) {
-            sender.sendMessage(ChatColor.RED + "You are currently editing a map!");
+            sender.sendMessage(textManager.get("general.errors.editingMap"));
         }
         if (KitDuels.playerMaps.containsKey((Player) sender)) {
-            sender.sendMessage(ChatColor.RED + "You are already in a game!");
+            sender.sendMessage(textManager.get("general.errors.alreadyInGame"));
             return true;
         }
 
@@ -51,8 +49,8 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("random")) {
                 String map = MapManager.getNextMap();
-                if (map == "") {
-                    sender.sendMessage(ChatColor.RED + "Either no slots or no maps are available!");
+                if (map.equals("")) {
+                    sender.sendMessage(textManager.get("general.errors.noMapsAvailable"));
                 } else {
                     MapManager.queuePlayerToMap(player, map);
                 }
@@ -66,7 +64,7 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
                     "b   h   f"
             };
 
-            InventoryGui inventoryGui = new InventoryGui(KitDuels.getInstance(), player, "Map select", mapLayout);
+            InventoryGui inventoryGui = new InventoryGui(KitDuels.getInstance(), player, textManager.get("ui.titles.mapSelect"), mapLayout);
 
             GuiElementGroup group = new GuiElementGroup('g');
             for (String map : KitDuels.enabledMaps.keySet()) {
@@ -74,12 +72,12 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
                 ItemMeta meta = item.getItemMeta();
                 meta.setDisplayName(map);
                 List<String> lore = new ArrayList<>();
-                lore.add(MapManager.getMapMaxPlayers(map) + " players");
-                if (KitDuels.ongoingMaps.contains(map) || KitDuels.inUseMaps.contains(map)) {
-                    lore.add("MAP IS IN USE!");
+                lore.add(textManager.get("ui.maxPlayerNum", MapManager.getMapMaxPlayers(map)));
+                if (KitDuels.ongoingMaps.contains(map) || KitDuels.inUseMaps.containsKey(map)) {
+                    lore.add(textManager.get("ui.mapInUse"));
                     item.setType(Material.RED_TERRACOTTA);
                 }
-                lore.add(KitDuels.enabledMaps.get(map).size() + " playing");
+                lore.add(textManager.get("ui.playing", KitDuels.enabledMaps.get(map).size()));
                 meta.setLore(lore);
                 item.setItemMeta(meta);
 
@@ -94,7 +92,7 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
 
             ItemStack item = new ItemStack(Material.YELLOW_TERRACOTTA);
             ItemMeta meta = item.getItemMeta();
-            meta.setDisplayName("Random map");
+            meta.setDisplayName(textManager.get("ui.randomMap"));
             item.setItemMeta(meta);
 
             group.addElement(new StaticGuiElement('e', item, click -> {
@@ -105,15 +103,15 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
             }));
             inventoryGui.addElement(group);
 
-            inventoryGui.addElement(new GuiPageElement('b', new ItemStack(Material.ARROW), GuiPageElement.PageAction.PREVIOUS, "Go to previous page (%prevpage%)"));
-            inventoryGui.addElement(new GuiPageElement('f', new ItemStack(Material.ARROW), GuiPageElement.PageAction.NEXT, "Go to next page (%nextpage%)"));
+            inventoryGui.addElement(new GuiPageElement('b', new ItemStack(Material.ARROW), GuiPageElement.PageAction.PREVIOUS, textManager.get("ui.buttons.previousPage")));
+            inventoryGui.addElement(new GuiPageElement('f', new ItemStack(Material.ARROW), GuiPageElement.PageAction.NEXT, textManager.get("ui.buttons.nextPage")));
 
-            inventoryGui.addElement(new StaticGuiElement('a', new ItemStack(Material.BOOK), "Map select"));
+            inventoryGui.addElement(new StaticGuiElement('a', new ItemStack(Material.BOOK), textManager.get("ui.title.mapSelect")));
             inventoryGui.addElement(new StaticGuiElement('h', new ItemStack(Material.PAPER), click -> {
                 inventoryGui.playClickSound();
                 inventoryGui.close();
                 return true;
-            }, "Close"));
+            }, textManager.get("ui.buttons.close")));
             inventoryGui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
 
             inventoryGui.show(player, true);
@@ -123,17 +121,17 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
     }
 
     private void tryMap(String map, Player player) {
-        if (map == "") {
-            player.sendMessage(ChatColor.RED + "Either no slots or no maps are available!");
+        if (map.equals("")) {
+            player.sendMessage(textManager.get("general.errors.noMapsAvailable"));
         }
 
         if (KitDuels.enabledMaps.containsKey(map)) {
             if (KitDuels.enabledMaps.get(map).size() >= MapManager.getMapMaxPlayers(map)) {
-                player.sendMessage(ChatColor.RED + "That map has no slots available!");
+                player.sendMessage(textManager.get("general.errors.noMapSlotsAvailable"));
                 return;
             }
         } else {
-            player.sendMessage(ChatColor.RED + "That map does not exist!");
+            player.sendMessage(textManager.get("general.errors.notAMap"));
             return;
         }
 

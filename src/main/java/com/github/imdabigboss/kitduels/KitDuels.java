@@ -1,11 +1,13 @@
 package com.github.imdabigboss.kitduels;
 
 import com.github.imdabigboss.kitduels.commands.*;
-
 import com.github.imdabigboss.kitduels.managers.HologramManager;
 import com.github.imdabigboss.kitduels.managers.MapManager;
 import com.github.imdabigboss.kitduels.managers.StatsManager;
+
+import com.github.imdabigboss.kitduels.managers.TextManager;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
+
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,10 +17,13 @@ import java.util.logging.Logger;
 
 public final class KitDuels extends JavaPlugin {
     private static final Logger log = Logger.getLogger("Minecraft");
+    private static TextManager textManager = null;
+
     private static KitDuels instance = null;
     private static YMLUtils mapsYML = null;
     private static YMLUtils kitsYML = null;
     private static YMLUtils statsYML = null;
+    private static YMLUtils messagesYML = null;
     private static boolean hologramsEnabled = false;
 
     public static Map<Player, String> editModePlayers = new HashMap<>();
@@ -28,7 +33,7 @@ public final class KitDuels extends JavaPlugin {
     public static List<String> allMaps = new ArrayList<>();
     public static Map<Player, String> playerMaps = new HashMap<>();
     public static List<String> ongoingMaps = new ArrayList<>();
-    public static List<String> inUseMaps = new ArrayList<>();
+    public static Map<String, Integer> inUseMaps = new HashMap<>();
 
     public static List<String> allKits = new ArrayList<>();
     public static Map<Player, String> playerKits = new HashMap<>();
@@ -63,6 +68,11 @@ public final class KitDuels extends JavaPlugin {
         mapsYML = new YMLUtils("maps.yml");
         kitsYML = new YMLUtils("kits.yml");
         statsYML = new YMLUtils("stats.yml");
+        messagesYML = new YMLUtils("messages.yml");
+
+        messagesYML.saveConfig();
+
+        textManager = new TextManager();
 
         getServer().getPluginManager().registerEvents(new EventListener(this), this);
 
@@ -124,6 +134,7 @@ public final class KitDuels extends JavaPlugin {
         this.getCommand("joingame").setExecutor(new JoinGameCommand(this));
         this.getCommand("leavegame").setExecutor(new LeaveGameCommand(this));
         this.getCommand("kitselect").setExecutor(new KitSelectCommand(this));
+        this.getCommand("kdstats").setExecutor(new KitDuelsStatsCommand(this));
 
         log.info(String.format("[%s] Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }
@@ -144,6 +155,10 @@ public final class KitDuels extends JavaPlugin {
     public static KitDuels getInstance() {
         return instance;
     }
+    public static TextManager getTextManager() {
+        return textManager;
+    }
+
     public static YMLUtils getMapsYML() {
         return mapsYML;
     }
@@ -153,6 +168,10 @@ public final class KitDuels extends JavaPlugin {
     public static YMLUtils getStatsYML() {
         return statsYML;
     }
+    public static YMLUtils getMessagesYML() {
+        return messagesYML;
+    }
+
     public static boolean getHologramsEnabled() {
         return hologramsEnabled;
     }

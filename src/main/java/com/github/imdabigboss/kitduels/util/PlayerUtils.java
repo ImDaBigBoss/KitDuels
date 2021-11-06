@@ -1,6 +1,7 @@
 package com.github.imdabigboss.kitduels.util;
 
 import com.github.imdabigboss.kitduels.KitDuels;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -26,6 +27,16 @@ public class PlayerUtils {
             KitDuels.getInstance().getConfig().set("registeredPlayers." + player.getName(), player.getUniqueId().toString());
             KitDuels.getInstance().saveConfig();
             return true;
+        }
+    }
+
+    public static boolean doesPlayerHaveTotem(Player player) {
+        if (player.getInventory().getItemInMainHand().getType() == Material.TOTEM_OF_UNDYING) {
+            return true;
+        } else if (player.getInventory().getItemInOffHand().getType() == Material.TOTEM_OF_UNDYING) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

@@ -40,7 +40,7 @@ public class MapManager {
         String currentMap = "";
 
         for (String map : KitDuels.enabledMaps.keySet()) {
-            if (KitDuels.inUseMaps.contains(map)) {
+            if (KitDuels.inUseMaps.containsKey(map)) {
                 continue;
             }
 
@@ -90,20 +90,20 @@ public class MapManager {
 
     public static void queuePlayerToMap(Player player, String map) {
         if (!KitDuels.enabledMaps.containsKey(map)) {
-            player.sendMessage(ChatColor.RED + "The map you were sent to does not exist!");
+            player.sendMessage(KitDuels.getTextManager().get("general.errors.notAMap"));
             return;
         }
         if (KitDuels.enabledMaps.get(map).size() == getMapMaxPlayers(map)) {
-            player.sendMessage(ChatColor.RED + "The map you were sent to has no more slots available!");
+            player.sendMessage(KitDuels.getTextManager().get("general.errors.noMapSlotsAvailable"));
             return;
         }
-        if (KitDuels.inUseMaps.contains(map)) {
-            player.sendMessage(ChatColor.RED + "The map you were sent to is in use!");
+        if (KitDuels.inUseMaps.containsKey(map) || KitDuels.ongoingMaps.contains(map)) {
+            player.sendMessage(KitDuels.getTextManager().get("general.errors.mapInUse"));
             return;
         }
 
         if (KitDuels.enabledMaps.get(map).contains(player)) {
-            player.sendMessage(ChatColor.RED + "You are already in the queue for this game!");
+            player.sendMessage(KitDuels.getTextManager().get("general.errors.alreadyInQueue"));
             return;
         }
 
@@ -115,7 +115,7 @@ public class MapManager {
             Location location = KitDuels.getMapsYML().getConfig().getLocation(map + ".spawn" + playerNum);
             player.teleport(location);
         } else {
-            player.sendMessage(ChatColor.RED + "Could not get your spawn location, please contact a server owner!");
+            player.sendMessage(KitDuels.getTextManager().get("general.errors.couldNotGetSpawn"));
             Location location = KitDuels.getMapsYML().getConfig().getLocation(map + ".world");
             player.teleport(location);
         }
@@ -124,21 +124,23 @@ public class MapManager {
 
         ItemStack item = new ItemStack(Material.CHEST);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("Kit selection");
+        meta.setDisplayName(KitDuels.getTextManager().get("items.kitSelect"));
         item.setItemMeta(meta);
         player.getInventory().setItem(0, item);
 
         item = new ItemStack(Material.RED_DYE);
         meta = item.getItemMeta();
-        meta.setDisplayName("Leave game");
+        meta.setDisplayName(KitDuels.getTextManager().get("items.leaveGame"));
         item.setItemMeta(meta);
         player.getInventory().setItem(8, item);
 
+        String message = KitDuels.getTextManager().get("messages.playerJoined", player.getDisplayName(), playerNum, getMapMaxPlayers(map));
         for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
-            mapPlayer.sendMessage(player.getDisplayName() + " has joined (" + ChatColor.GREEN + playerNum + "/" + getMapMaxPlayers(map) + ChatColor.RESET + ")");
+            mapPlayer.sendMessage(message);
         }
 
         if (KitDuels.enabledMaps.get(map).size() == getMapMaxPlayers(map)) {
+            KitDuels.inUseMaps.put(map, 1);
             new CountdownTimer(10, KitDuels.getInstance()) {
                 @Override
                 public void count(int current) {
@@ -146,8 +148,8 @@ public class MapManager {
                         startGame(map);
                     } else {
                         for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
-                            mapPlayer.sendMessage("Game starting in " + ChatColor.GOLD + current);
-                            mapPlayer.sendTitle(ChatColor.RED.toString() + current, ChatColor.GOLD + "Game starting soon!", 0, 30, 0);
+                            mapPlayer.sendMessage(KitDuels.getTextManager().get("messages.gameStarting", current));
+                            mapPlayer.sendTitle(ChatColor.RED.toString() + current, KitDuels.getTextManager().get("messages.gameStartingSoon"), 0, 30, 0);
                             mapPlayer.getWorld().playSound(mapPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 2);
                         }
                     }
@@ -159,9 +161,6 @@ public class MapManager {
     public static boolean removePlayerFromMap(Player player) {
         if (KitDuels.playerMaps.containsKey(player)) {
             String map = KitDuels.playerMaps.get(player);
-            if (KitDuels.inUseMaps.contains(map) && !KitDuels.ongoingMaps.contains(map)) {
-                return false;
-            }
 
             KitDuels.enabledMaps.get(map).remove(player);
             KitDuels.playerMaps.remove(player);
@@ -171,11 +170,11 @@ public class MapManager {
 
                 String gameOver = "";
                 if (KitDuels.enabledMaps.get(map).size() < 2) {
-                    gameOver = ", game over";
+                    gameOver = KitDuels.getTextManager().get("messages.gameOver");
                 }
 
                 for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
-                    mapPlayer.sendMessage(player.getDisplayName() + " has left" + gameOver);
+                    mapPlayer.sendMessage(KitDuels.getTextManager().get("messages.playerLeftOngoing") + gameOver);
                 }
 
                 if (player.isOnline()) {
@@ -185,20 +184,33 @@ public class MapManager {
                         player.removePotionEffect(effect.getType());
                     }
                     GameManager.sendToSpawn(player);
-                    player.sendMessage("You left the map");
+                    player.sendMessage(KitDuels.getTextManager().get("messages.youLeft"));
                 }
 
                 gameEnded(map);
             } else {
-                if (!KitDuels.mapAlivePlayers.containsKey(map)) {
+                boolean sendMessage = false;
+                if (!KitDuels.inUseMaps.containsKey(map)) {
+                    sendMessage = true;
+                }
+                if (KitDuels.inUseMaps.containsKey(map)) {
+                    if (KitDuels.inUseMaps.get(map) == 1) {
+                        sendMessage = true;
+                    }
+                }
+
+                if (sendMessage) {
+                    String message = KitDuels.getTextManager().get("messages.playerLeft", player.getDisplayName(), KitDuels.enabledMaps.get(map).size(), getMapMaxPlayers(map));
                     for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
-                        mapPlayer.sendMessage(player.getDisplayName() + " has left (" + ChatColor.GREEN + KitDuels.enabledMaps.get(map).size() + "/" + getMapMaxPlayers(map) + ChatColor.RESET + ")");
+                        mapPlayer.sendMessage(message);
                     }
 
                     if (player.isOnline()) {
-                        player.sendMessage("You left the map");
+                        player.sendMessage(KitDuels.getTextManager().get("messages.youLeft"));
                         GameManager.sendToSpawn(player);
                     }
+                } else {
+                    GameManager.sendToSpawn(player);
                 }
             }
 
@@ -211,14 +223,16 @@ public class MapManager {
     public static void startGame(String map) {
         if (KitDuels.enabledMaps.get(map).size() != getMapMaxPlayers(map)) {
             for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
-                mapPlayer.sendMessage("Game start canceled...");
+                mapPlayer.sendMessage(KitDuels.getTextManager().get("messages.gameStartCancelled"));
             }
+            KitDuels.inUseMaps.remove(map);
             return;
         }
 
+        KitDuels.inUseMaps.replace(map, 0);
         KitDuels.ongoingMaps.add(map);
-        KitDuels.inUseMaps.add(map);
         KitDuels.mapAlivePlayers.put(map, new ArrayList<>());
+
         int playerNum = 1;
         for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
             KitDuels.mapAlivePlayers.get(map).add(mapPlayer);
@@ -227,8 +241,8 @@ public class MapManager {
             mapPlayer.getInventory().clear();
             mapPlayer.setFireTicks(0);
 
-            mapPlayer.sendMessage("Go, go, go!");
-            mapPlayer.sendTitle(ChatColor.RED + "Fight!", " ", 0, 10, 10);
+            mapPlayer.sendMessage(KitDuels.getTextManager().get("messages.gameStarted"));
+            mapPlayer.sendTitle(KitDuels.getTextManager().get("messages.gameStartedTitle"), " ", 0, 10, 10);
             mapPlayer.setGameMode(GameMode.SURVIVAL);
 
             if (KitDuels.allKits.size() > 0) {
@@ -240,10 +254,10 @@ public class MapManager {
                     kitName = KitDuels.allKits.get(index);
                 }
                 GameManager.loadKitToPlayer(mapPlayer, kitName);
-                mapPlayer.sendMessage(ChatColor.GREEN + "You got the " + ChatColor.GOLD + kitName + ChatColor.GREEN + " kit!");
+                mapPlayer.sendMessage(KitDuels.getTextManager().get("messages.gotKit", kitName));
             } else {
                 if (mapPlayer.isOp()) {
-                    mapPlayer.sendMessage("Consider adding kits with /kdkits!");
+                    mapPlayer.sendMessage(KitDuels.getTextManager().get("messages.considerAddingKits"));
                 }
             }
 
@@ -251,7 +265,7 @@ public class MapManager {
                 Location location = KitDuels.getMapsYML().getConfig().getLocation(map + ".spawn" + playerNum);
                 mapPlayer.teleport(location);
             } else {
-                mapPlayer.sendMessage(ChatColor.RED + "Could not get your spawn location, please contact a server owner!");
+                mapPlayer.sendMessage(KitDuels.getTextManager().get("general.errors.couldNotGetSpawn"));
                 Location location = KitDuels.getMapsYML().getConfig().getLocation(map + ".world");
                 mapPlayer.teleport(location);
             }

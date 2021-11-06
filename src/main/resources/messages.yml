@@ -1,0 +1,134 @@
+general:
+  errors:
+    notPlayer: "§cYou must be a player to use this command!"
+
+    editingMap: "§cYou are currently editing a map!"
+    notEditingMap: "§cYou are not editing a map!"
+    alreadyInGame: "§cYou are already in a game!"
+    notInGame: "§cYou are not in a game!"
+
+    lessThanTwoPlayers: "§cA map can not have less than 2 players!"
+    maxNumPlayersNotSet: "§cThe max number of players has not been set!"
+
+    noMapsAvailable: "§cEither no slots or no maps are available!"
+    noMapSlotsAvailable: "§cThat map has no slots available!"
+    mapInUse: "§cThat map has an ongoing game!"
+    notAMap: "§cThat map does not exist!"
+    mapAlreadyExists: "§cThat map already exists!"
+    mapAlreadyEnabled: "§cThat map is already enabled!"
+    mapNotEnabled: "§cThat map is not enabled!"
+    alreadyInQueue: "§cYou are already in the queue for this map!"
+
+    resetPosNotSet: "§cThe reset positions were not set! Use §6/kd pos1§r and §6/kd pos2§r to set them!"
+    couldNotGetSpawn: "§cCould not get your spawn location, please contact a server owner."
+
+    hologramsNotEnabled: "§cHolograms are not enabled, please add the HolographicDisplays plugin!"
+
+    kitNameReserved: "§cThat kit name is reserved!"
+    kitAlreadyExists: "§cThat kit already exists!"
+    kitDoesntExist: "§cThat kit doesn't exist!"
+    unableToDecodeClassType: "§cAn error occurred: Unable to decode class type."
+    unableToSaveItemStacks: "§cAn error occurred: Unable to save item stacks."
+
+    notANum: "§cThat is not a number!"
+    negativeOrNullNumber: "§cYou can't use a negative or null number!"
+
+  warning:
+    mapInUse: "§cBe careful! That map is in use."
+    uuidWasSkipped: "%s was skipped in stats!"
+
+  info:
+    creatingWorld: "§bCreating world..."
+    done: "§bDone!"
+    mapSaving: "§bSaving the map..."
+    mapSaved: "§bMap saved! You have exited edit mode."
+    mapLoading: "§bLoading the map..."
+    mapLoaded: "§bMap loaded! You are now editing %s!"
+
+    mapAdded: "The map was added! Please use the following commands to finish the map setup: §6/kd maxPlayers %d§r, §6/kd spawn <number>§r, §6/kd pos1§r and §6/kd pos2§r. Then enable the map: §6/kd enable %s"
+    mapDeleted: "§bThe map was deleted."
+    mapEnabled: "§bThe map was enabled!"
+    mapDisabled: "§bThe map was disabled!"
+
+    maxPlayersSet: "§bThe max players was set to %d for this map."
+    spawnPointSet: "§bYou set the spawn point %d out of %d for this map."
+    lobbySpawnPointSet: "§bYou set the lobby spawn point here."
+    resetPosSet: "§bYou have set %s here."
+
+    hologramPosSet: "§bYou have set the hologram position here."
+    hologramRemoved: "§bYou have removed the hologram."
+
+    mapList:
+      header: "The following maps are available:"
+      line: "- %s, %d players"
+      enabled: " §aEnabled§r"
+      disabled: " §cDisabled§r"
+
+    kitAdded: "§bYour kit was added. Its contents is your current inventory."
+    kitSaved: "§bYour kit was saved. Its contents is your current inventory."
+    kitSelected: "§bYou have selected the %s kit."
+    kitRandomSelected: "§bYour kit is now random."
+    kitDeleted: "§bThe kit was deleted."
+    kitLoaded: "§bYou have loaded the kit into your inventory."
+    kitList: "Here are all the kits:\n - RANDOM"
+
+hologram:
+  header: "§6§lLeaderboard:§r"
+  line: "%d. %s §b%d§r"
+  lineNoData: "%d. No data available"
+
+stats:
+  header: "§6§lYour statistics:§r"
+  wins: "- %d wins"
+  losses: "- %d losses"
+  kills: "- %d kills"
+  deaths: "- %d deaths"
+
+ui:
+  mapInUse: "MAP IS IN USE!"
+  maxPlayerNum: "%d players"
+  playing: "%d playing"
+
+  randomMap: "Random map"
+  randomKit: "Random kit"
+
+  titles:
+    mapSelect: "Map select"
+    kitSelect: "Kit select"
+
+  buttons:
+    previousPage: "Go to previous page (%prevpage%)"
+    nextPage: "Go to next page (%nextpage%)"
+    close: "Close"
+
+items:
+  kitSelect: "Kit selection"
+  leaveGame: "Leave game"
+
+messages:
+  playerJoined: "%s has joined (§a%d/%d§r)"
+  playerLeft: "%s has left (§a%d/%d§r)"
+  playerLeftOngoing: "%s has left"
+  gameOver: ", game over"
+  youLeft: "You left the game"
+
+  gameStarting: "Game starting in %d"
+  gameStartingSoon: "Game starting soon!"
+  gameStartCancelled: "Game start cancelled..."
+  gameStarted: "Go, go, go!"
+  gameStartedTitle: "§cFight!"
+
+  gotKit: "You got the §6%s§r kit!"
+  considerAddingKits: "Consider adding some kits using §6/kdkits§r!"
+
+  playerKilled: "%s §awas killed"
+  playerKilledByPlayer: "%s §awas killed by §r%s§a!"
+  playerWon: "%s §awon the game!"
+
+  gameOverTitles:
+    win:
+      title: "§6VICTORY!"
+      subtitle: "You won the game!"
+    lose:
+      title: "§cDEFEAT!"
+      subtitle: "%s won the game!"

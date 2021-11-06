@@ -4,11 +4,13 @@ import com.github.imdabigboss.kitduels.managers.GameManager;
 import com.github.imdabigboss.kitduels.managers.MapManager;
 import com.github.imdabigboss.kitduels.managers.StatsManager;
 import com.github.imdabigboss.kitduels.util.PlayerUtils;
+
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -54,7 +56,7 @@ public class EventListener implements Listener {
                     return;
                 }
 
-                if (player.getHealth() - event.getFinalDamage() <= 0) {
+                if (player.getHealth() - event.getFinalDamage() <= 0 && !PlayerUtils.doesPlayerHaveTotem(player)) {
                     event.setCancelled(true);
                     player.setHealth(20);
                     KitDuels.mapAlivePlayers.get(map).remove(player);
@@ -70,8 +72,19 @@ public class EventListener implements Listener {
                         world.strikeLightning(player.getLocation());
                     }
 
+                    String deathMessage = KitDuels.getTextManager().get("messages.playerKilled", player.getDisplayName());
+                    if (event instanceof EntityDamageByEntityEvent) {
+                        EntityDamageByEntityEvent entityDamageByEntityEvent = (EntityDamageByEntityEvent) event;
+                        if (entityDamageByEntityEvent.getDamager() instanceof Player) {
+                            Player damager = (Player) entityDamageByEntityEvent.getDamager();
+                            deathMessage = KitDuels.getTextManager().get("messages.playerKilledByPlayer", player.getDisplayName(), damager.getDisplayName());
+                            StatsManager.addPlayerKill(damager);
+                        }
+                    }
+                    StatsManager.addPlayerDeath(player);
+
                     for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
-                        mapPlayer.sendMessage(player.getDisplayName() + ChatColor.GREEN + " was killed!");
+                        mapPlayer.sendMessage(deathMessage);
                         mapPlayer.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1, 1);
                     }
 
@@ -86,14 +99,15 @@ public class EventListener implements Listener {
                         for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
                             mapPlayer.setHealth(20);
                             mapPlayer.setFoodLevel(20);
-                            mapPlayer.sendMessage(winPlayer.getDisplayName() + " wins!");
+                            mapPlayer.sendMessage(KitDuels.getTextManager().get("messages.playerWon", winPlayer.getDisplayName()));
                             if (mapPlayer == winPlayer) {
-                                mapPlayer.sendTitle(ChatColor.GOLD + "VICTORY!", "You won the game", 0, 60, 10);
+                                mapPlayer.sendTitle(KitDuels.getTextManager().get("messages.gameOverTitles.win.title"), KitDuels.getTextManager().get("messages.gameOverTitles.win.subtitle"), 0, 60, 10);
                                 mapPlayer.setGameMode(GameMode.ADVENTURE);
                                 StatsManager.addPlayerWin(mapPlayer);
                             } else {
-                                mapPlayer.sendTitle(ChatColor.RED + "DEFEAT!", winPlayer.getDisplayName() + ChatColor.GREEN + " won the game", 0, 60, 10);
+                                mapPlayer.sendTitle(KitDuels.getTextManager().get("messages.gameOverTitles.lose.title"), KitDuels.getTextManager().get("messages.gameOverTitles.lose.subtitle", winPlayer.getDisplayName()), 0, 60, 10);
                                 mapPlayer.setGameMode(GameMode.SPECTATOR);
+                                StatsManager.addPlayerLoss(player);
                             }
                         }
 
@@ -122,9 +136,23 @@ public class EventListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onHungerDeplete(FoodLevelChangeEvent event) {
-        event.setCancelled(true);
         Player player = (Player) event.getEntity();
-        player.setFoodLevel(20);
+        if (KitDuels.playerMaps.containsKey(player)) {
+            event.setCancelled(true);
+            player.setFoodLevel(20);
+        } else {
+            if (KitDuels.disableDamageWhenNotInGame) {
+                if (KitDuels.disableDamageInSelectWorlds) {
+                    if (KitDuels.lobbyWorlds.contains(player.getWorld().getName())) {
+                        event.setCancelled(true);
+                        player.setFoodLevel(20);
+                    }
+                } else {
+                    event.setCancelled(true);
+                    player.setFoodLevel(20);
+                }
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

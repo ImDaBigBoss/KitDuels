@@ -2,24 +2,32 @@ name: KitDuels
 version: ${project.version}
 main: com.github.imdabigboss.kitduels.KitDuels
 api-version: 1.17
-softdepend: [Multiverse-Core, MultiWorld, VoidGenerator, WorldEdit, HolographicDisplays]
+softdepend: [VoidGenerator, WorldEdit, HolographicDisplays]
 
 commands:
   kd:
-    permission: kitduels.admin
+    permission: kitduels.kd
   kdkits:
-    permission: kitduels.admin
+    permission: kitduels.kdkits
   joingame:
-    permission: kitduels.normal
+    permission: kitduels.joingame
   leavegame:
-    permission: kitduels.normal
+    permission: kitduels.leavegame
   kitselect:
     permission: kitduels.kitselect
+  kdstats:
+    permission: kitduels.kdstats
 
 permissions:
-  kitduels.admin:
+  kitduels.kd:
     default: op
-  kitduels.normal:
+  kitduels.kdkits:
+    default: op
+  kitduels.joingame:
+    default: true
+  kitduels.leavegame:
     default: true
   kitduels.kitselect:
+    default: true
+  kitduels.kdstats:
     default: true

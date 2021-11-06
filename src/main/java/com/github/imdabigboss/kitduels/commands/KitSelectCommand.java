@@ -1,9 +1,9 @@
 package com.github.imdabigboss.kitduels.commands;
 
-import com.github.imdabigboss.kitduels.managers.GameManager;
 import com.github.imdabigboss.kitduels.KitDuels;
+import com.github.imdabigboss.kitduels.managers.GameManager;
+import com.github.imdabigboss.kitduels.managers.TextManager;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,16 +14,18 @@ import java.util.List;
 
 public class KitSelectCommand implements CommandExecutor, TabExecutor {
     private KitDuels plugin;
+    private TextManager textManager;
 
     public KitSelectCommand(KitDuels plugin) {
         super();
         this.plugin = plugin;
+        this.textManager = KitDuels.getTextManager();
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "This command can only be used as a player!");
+            sender.sendMessage(textManager.get("general.errors.notPlayer"));
             return true;
         }
         Player player = (Player) sender;
@@ -36,13 +38,13 @@ public class KitSelectCommand implements CommandExecutor, TabExecutor {
             KitDuels.playerKits.remove(player);
         } else {
             if (!KitDuels.allKits.contains(args[0])) {
-                sender.sendMessage(ChatColor.RED + "That kit does not exist!");
+                sender.sendMessage(textManager.get("general.errors.kitDoesntExist"));
                 return true;
             }
             KitDuels.playerKits.put(player, args[0]);
         }
 
-        sender.sendMessage(ChatColor.AQUA + "You have selected the " + args[0] + " kit!");
+        sender.sendMessage(textManager.get("general.info.kitSelected", args[0]));
         return true;
     }
 

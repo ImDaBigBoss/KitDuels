@@ -4,7 +4,7 @@ import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.util.KitDuelsPlaceholderReplacer;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import org.bukkit.ChatColor;
+
 import org.bukkit.Location;
 
 public class HologramManager {
@@ -14,7 +14,7 @@ public class HologramManager {
         deleteAllHolos();
 
         Hologram hologram = HologramsAPI.createHologram(KitDuels.getInstance(), location);
-        hologram.appendTextLine(ChatColor.YELLOW + "Leaderboard:");
+        hologram.appendTextLine(KitDuels.getTextManager().get("hologram.header"));
         for (int i = 1; i <= leaderboardLines; i++) {
             hologram.appendTextLine("{kitduels_stats_" + i + "}");
         }
