@@ -2,9 +2,8 @@ package com.github.imdabigboss.kitduels.commands;
 
 import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.managers.MapManager;
-
 import com.github.imdabigboss.kitduels.managers.TextManager;
-import org.bukkit.ChatColor;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

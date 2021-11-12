@@ -4,7 +4,6 @@ import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.util.PlayerStats;
 import com.github.imdabigboss.kitduels.util.PlayerUtils;
 
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 

@@ -1,10 +1,10 @@
 package com.github.imdabigboss.kitduels.commands;
 
-import com.github.imdabigboss.kitduels.managers.GameManager;
 import com.github.imdabigboss.kitduels.KitDuels;
+import com.github.imdabigboss.kitduels.YMLUtils;
+import com.github.imdabigboss.kitduels.managers.GameManager;
 import com.github.imdabigboss.kitduels.managers.HologramManager;
 import com.github.imdabigboss.kitduels.managers.MapManager;
-import com.github.imdabigboss.kitduels.YMLUtils;
 import com.github.imdabigboss.kitduels.managers.TextManager;
 import com.github.imdabigboss.kitduels.util.WorldEditUtils;
 import com.github.imdabigboss.kitduels.util.WorldUtils;
@@ -77,7 +77,7 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                         List<String> keys = new ArrayList<>(KitDuels.enabledMaps.keySet());
                         plugin.getConfig().set("enabledMaps", keys);
 
-                        if (KitDuels.allMaps.contains(args[1])) {
+                        if (KitDuels.allMaps.containsKey(args[1])) {
                             KitDuels.allMaps.remove(args[1]);
                             plugin.getConfig().set("allMaps", KitDuels.allMaps);
                         }
@@ -198,10 +198,14 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                             sender.sendMessage(textManager.get("general.errors.notPlayer"));
                             return true;
                         }
+                        Player player = (Player) sender;
+                        if (KitDuels.editModePlayers.containsKey(player)) {
+                            sender.sendMessage(textManager.get("general.errors.editingMap"));
+                            return true;
+                        }
                         if (KitDuels.inUseMaps.containsKey(args[1])) {
                             sender.sendMessage(textManager.get("general.warning.mapInUse"));
                         }
-                        Player player = (Player) sender;
 
                         sender.sendMessage(textManager.get("general.info.mapLoading"));
                         KitDuels.inUseMaps.put(args[1], 0);
@@ -239,7 +243,12 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                 String maps = textManager.get("general.info.mapList.header");
                 for (String key : keys) {
                     int max = MapManager.getMapMaxPlayers(key);
-                    maps += "\n " + textManager.get("general.info.mapList.line", key, max);
+
+                    String kitName = KitDuels.allMaps.get(key);
+                    if (kitName.equalsIgnoreCase("")) {
+                        kitName = "None";
+                    }
+                    maps += "\n " + textManager.get("general.info.mapList.line", key, max, kitName);
                     if (KitDuels.enabledMaps.containsKey(key)) {
                         maps += textManager.get("general.info.mapList.enabled");
                     } else {
@@ -250,7 +259,7 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
             } else if (args[0].equals("enable")) {
                 if (args.length == 2) {
                     if (!KitDuels.enabledMaps.containsKey(args[1])) {
-                        if (KitDuels.allMaps.contains(args[1])) {
+                        if (KitDuels.allMaps.containsKey(args[1])) {
                             KitDuels.enabledMaps.put(args[1], new ArrayList<>());
                             List<String> keys = new ArrayList<>(KitDuels.enabledMaps.keySet());
                             plugin.getConfig().set("enabledMaps", keys);
@@ -309,6 +318,26 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
                 HologramManager.deleteAllHolos();
                 plugin.getConfig().set("hologramPos", null);
                 sender.sendMessage(textManager.get("general.info.hologramRemoved"));
+            } else if (args[0].equalsIgnoreCase("setKit")) {
+                if (args.length == 2) {
+                    if (KitDuels.allKits.contains(args[1]) || args[1].equalsIgnoreCase("random")) {
+                        Player player = (Player) sender;
+                        if (!KitDuels.editModePlayers.containsKey(player)) {
+                            sender.sendMessage(textManager.get("general.errors.notEditingMap"));
+                            return true;
+                        }
+                        String playerMap = KitDuels.editModePlayers.get(player);
+                        String newKit = args[1].equalsIgnoreCase("random") ? "" : args[1];
+
+                        mapsYML.getConfig().set(playerMap + ".mapKit", newKit);
+                        KitDuels.allMaps.replace(playerMap, newKit);
+                        sender.sendMessage(textManager.get("general.info.mapKitSet", args[1]));
+                    } else {
+                        sender.sendMessage(textManager.get("general.errors.kitDoesntExist"));
+                    }
+                } else {
+                    sendHelp(sender);
+                }
             } else {
                 sendHelp(sender);
             }
@@ -320,7 +349,7 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
     }
 
     public void sendHelp(CommandSender sender) {
-        sender.sendMessage("The correct usage is:\n - create <name>\n - delete <name>\n - maxPlayers <number>\n - spawn <number>\n - save\n - edit <name>\n - lobbySpawn\n - list\n - enable <name>\n - disable <name>\n - pos1\n - pos2\n - setHolo\n - delHolo");
+        sender.sendMessage("The correct usage is:\n - create <name>\n - delete <name>\n - maxPlayers <number>\n - spawn <number>\n - save\n - edit <name>\n - lobbySpawn\n - list\n - enable <name>\n - disable <name>\n - pos1\n - pos2\n - setHolo\n - delHolo\n setKit <name>");
     }
 
     @Override
@@ -341,10 +370,14 @@ public class KitDuelsCommand implements CommandExecutor, TabExecutor {
             cmds.add("pos2");
             cmds.add("setHolo");
             cmds.add("delHolo");
+            cmds.add("setKit");
 
         } else if (args.length == 2) {
             if (args[0].equals("edit") || args[0].equals("delete") || args[0].equals("enable") || args[0].equals("disable")) {
                 cmds.addAll(mapsYML.getConfig().getKeys(false));
+            } else if (args[0].equals("setKit")) {
+                cmds.addAll(KitDuels.allKits);
+                cmds.add("random");
             }
         }
         return cmds;

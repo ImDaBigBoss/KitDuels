@@ -49,6 +49,7 @@ general:
     mapDeleted: "§bThe map was deleted."
     mapEnabled: "§bThe map was enabled!"
     mapDisabled: "§bThe map was disabled!"
+    mapKitSet: "§bThis map's kit was set to %s!"
 
     maxPlayersSet: "§bThe max players was set to %d for this map."
     spawnPointSet: "§bYou set the spawn point %d out of %d for this map."
@@ -60,9 +61,9 @@ general:
 
     mapList:
       header: "The following maps are available:"
-      line: "- %s, %d players"
-      enabled: " §aEnabled§r"
-      disabled: " §cDisabled§r"
+      line: "- %s, %d players, kit: %s, state: "
+      enabled: "§aEnabled§r"
+      disabled: "§cDisabled§r"
 
     kitAdded: "§bYour kit was added. Its contents is your current inventory."
     kitSaved: "§bYour kit was saved. Its contents is your current inventory."
@@ -88,6 +89,8 @@ ui:
   mapInUse: "MAP IS IN USE!"
   maxPlayerNum: "%d players"
   playing: "%d playing"
+  mapName: "Map name: %s"
+  kitName: "Kit name: %s"
 
   randomMap: "Random map"
   randomKit: "Random kit"

@@ -1,6 +1,7 @@
 package com.github.imdabigboss.kitduels.util;
 
 import com.github.imdabigboss.kitduels.KitDuels;
+
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

@@ -46,6 +46,7 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
 
         Player player = (Player) sender;
 
+        boolean kit = false;
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("random")) {
                 String map = MapManager.getNextMap();
@@ -54,24 +55,58 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
                 } else {
                     MapManager.queuePlayerToMap(player, map);
                 }
+                return true;
+            } else if (args[0].equalsIgnoreCase("kit")) {
+                kit = true;
+            }
+        }
+
+        String[] mapLayout = {
+                "    a    ",
+                "ggggggggg",
+                "ggggggggg",
+                "ggggggggg",
+                "b   h   f"
+        };
+
+        InventoryGui inventoryGui = new InventoryGui(KitDuels.getInstance(), player, textManager.get("ui.titles.mapSelect"), mapLayout);
+
+        GuiElementGroup group = new GuiElementGroup('g');
+        if (kit) {
+            for (String map : KitDuels.enabledMaps.keySet()) {
+                if (!KitDuels.allMaps.get(map).equalsIgnoreCase("")) {
+                    ItemStack item = new ItemStack(Material.GREEN_TERRACOTTA);
+                    ItemMeta meta = item.getItemMeta();
+                    meta.setDisplayName(KitDuels.allMaps.get(map));
+                    List<String> lore = new ArrayList<>();
+                    lore.add(textManager.get("ui.mapName", map));
+                    lore.add(textManager.get("ui.maxPlayerNum", MapManager.getMapMaxPlayers(map)));
+                    if (KitDuels.ongoingMaps.contains(map) || KitDuels.inUseMaps.containsKey(map)) {
+                        lore.add(textManager.get("ui.mapInUse"));
+                        item.setType(Material.RED_TERRACOTTA);
+                    }
+                    lore.add(textManager.get("ui.playing", KitDuels.enabledMaps.get(map).size()));
+                    meta.setLore(lore);
+                    item.setItemMeta(meta);
+
+                    group.addElement(new StaticGuiElement('e', item, click -> {
+                        inventoryGui.playClickSound();
+                        String mapName = click.getEvent().getCurrentItem().getItemMeta().getLore().get(0).replace(textManager.get("ui.mapName", ""), "");
+                        tryMap(mapName, player);
+                        inventoryGui.close();
+                        return true;
+                    }));
+                }
             }
         } else {
-            String[] mapLayout = {
-                    "    a    ",
-                    "ggggggggg",
-                    "ggggggggg",
-                    "ggggggggg",
-                    "b   h   f"
-            };
-
-            InventoryGui inventoryGui = new InventoryGui(KitDuels.getInstance(), player, textManager.get("ui.titles.mapSelect"), mapLayout);
-
-            GuiElementGroup group = new GuiElementGroup('g');
             for (String map : KitDuels.enabledMaps.keySet()) {
                 ItemStack item = new ItemStack(Material.GREEN_TERRACOTTA);
                 ItemMeta meta = item.getItemMeta();
                 meta.setDisplayName(map);
                 List<String> lore = new ArrayList<>();
+                if (!KitDuels.allMaps.get(map).equalsIgnoreCase("")) {
+                    lore.add(textManager.get("ui.kitName", KitDuels.allMaps.get(map)));
+                }
                 lore.add(textManager.get("ui.maxPlayerNum", MapManager.getMapMaxPlayers(map)));
                 if (KitDuels.ongoingMaps.contains(map) || KitDuels.inUseMaps.containsKey(map)) {
                     lore.add(textManager.get("ui.mapInUse"));
@@ -89,33 +124,33 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
                     return true;
                 }));
             }
-
-            ItemStack item = new ItemStack(Material.YELLOW_TERRACOTTA);
-            ItemMeta meta = item.getItemMeta();
-            meta.setDisplayName(textManager.get("ui.randomMap"));
-            item.setItemMeta(meta);
-
-            group.addElement(new StaticGuiElement('e', item, click -> {
-                inventoryGui.playClickSound();
-                tryMap(MapManager.getNextMap(), player);
-                inventoryGui.close();
-                return true;
-            }));
-            inventoryGui.addElement(group);
-
-            inventoryGui.addElement(new GuiPageElement('b', new ItemStack(Material.ARROW), GuiPageElement.PageAction.PREVIOUS, textManager.get("ui.buttons.previousPage")));
-            inventoryGui.addElement(new GuiPageElement('f', new ItemStack(Material.ARROW), GuiPageElement.PageAction.NEXT, textManager.get("ui.buttons.nextPage")));
-
-            inventoryGui.addElement(new StaticGuiElement('a', new ItemStack(Material.BOOK), textManager.get("ui.title.mapSelect")));
-            inventoryGui.addElement(new StaticGuiElement('h', new ItemStack(Material.PAPER), click -> {
-                inventoryGui.playClickSound();
-                inventoryGui.close();
-                return true;
-            }, textManager.get("ui.buttons.close")));
-            inventoryGui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
-
-            inventoryGui.show(player, true);
         }
+
+        ItemStack item = new ItemStack(Material.YELLOW_TERRACOTTA);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(textManager.get("ui.randomMap"));
+        item.setItemMeta(meta);
+
+        group.addElement(new StaticGuiElement('e', item, click -> {
+            inventoryGui.playClickSound();
+            tryMap(MapManager.getNextMap(), player);
+            inventoryGui.close();
+            return true;
+        }));
+        inventoryGui.addElement(group);
+
+        inventoryGui.addElement(new GuiPageElement('b', new ItemStack(Material.ARROW), GuiPageElement.PageAction.PREVIOUS, textManager.get("ui.buttons.previousPage")));
+        inventoryGui.addElement(new GuiPageElement('f', new ItemStack(Material.ARROW), GuiPageElement.PageAction.NEXT, textManager.get("ui.buttons.nextPage")));
+
+        inventoryGui.addElement(new StaticGuiElement('a', new ItemStack(Material.BOOK), textManager.get("ui.title.mapSelect")));
+        inventoryGui.addElement(new StaticGuiElement('h', new ItemStack(Material.PAPER), click -> {
+            inventoryGui.playClickSound();
+            inventoryGui.close();
+            return true;
+        }, textManager.get("ui.buttons.close")));
+        inventoryGui.setFiller(new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1));
+
+        inventoryGui.show(player, true);
 
         return true;
     }
@@ -143,6 +178,7 @@ public class JoinGameCommand implements CommandExecutor, TabExecutor {
         ArrayList<String> cmds = new ArrayList<>();
         if (args.length == 1) {
             cmds.add("random");
+            cmds.add("kit");
         }
         return cmds;
     }

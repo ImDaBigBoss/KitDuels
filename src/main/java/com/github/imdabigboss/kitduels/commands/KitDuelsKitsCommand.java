@@ -1,8 +1,8 @@
 package com.github.imdabigboss.kitduels.commands;
 
-import com.github.imdabigboss.kitduels.managers.GameManager;
 import com.github.imdabigboss.kitduels.KitDuels;
 import com.github.imdabigboss.kitduels.YMLUtils;
+import com.github.imdabigboss.kitduels.managers.GameManager;
 import com.github.imdabigboss.kitduels.managers.TextManager;
 import com.github.imdabigboss.kitduels.util.InventorySerialization;
 

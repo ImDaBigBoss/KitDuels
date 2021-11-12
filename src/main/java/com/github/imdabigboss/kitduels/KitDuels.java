@@ -4,8 +4,8 @@ import com.github.imdabigboss.kitduels.commands.*;
 import com.github.imdabigboss.kitduels.managers.HologramManager;
 import com.github.imdabigboss.kitduels.managers.MapManager;
 import com.github.imdabigboss.kitduels.managers.StatsManager;
-
 import com.github.imdabigboss.kitduels.managers.TextManager;
+
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 
 import org.bukkit.*;
@@ -30,7 +30,7 @@ public final class KitDuels extends JavaPlugin {
 
     public static Map<String, List<Player>> enabledMaps = new HashMap<>();
     public static Map<String, List<Player>> mapAlivePlayers = new HashMap<>();
-    public static List<String> allMaps = new ArrayList<>();
+    public static Map<String, String> allMaps = new HashMap<>();
     public static Map<Player, String> playerMaps = new HashMap<>();
     public static List<String> ongoingMaps = new ArrayList<>();
     public static Map<String, Integer> inUseMaps = new HashMap<>();
@@ -45,7 +45,23 @@ public final class KitDuels extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
+        log.info(String.format("[%s] Loading configurations...", getDescription().getName(), getDescription().getVersion()));
         this.saveDefaultConfig();
+
+        mapsYML = new YMLUtils("maps.yml");
+        kitsYML = new YMLUtils("kits.yml");
+        statsYML = new YMLUtils("stats.yml");
+        messagesYML = new YMLUtils("messages.yml");
+
+        messagesYML.saveConfig();
+
+        if (kitsYML.getConfig().contains("allKits")) {
+            if (kitsYML.getConfig().get("allKits") != null) {
+                List<String> kits = kitsYML.getConfig().getStringList("allKits");
+                allKits.addAll(kits);
+            }
+        }
 
         log.info(String.format("[%s] Loading worlds...", getDescription().getName(), getDescription().getVersion()));
 
@@ -58,19 +74,28 @@ public final class KitDuels extends JavaPlugin {
                     wc.type(WorldType.NORMAL);
                     World world = wc.createWorld();
                     MapManager.setMapGameRules(world);
-                    allMaps.add(map);
+
+                    String kitName = "";
+                    if (mapsYML.getConfig().contains(map + ".mapKit")) {
+                        boolean hasKit = false;
+                        String tmpKitName = mapsYML.getConfig().getString(map + ".mapKit");
+                        for (String tmp : allKits) {
+                            if (tmp.equalsIgnoreCase(tmpKitName)) {
+                                hasKit = true;
+                                break;
+                            }
+                        }
+
+                        if (hasKit) {
+                            kitName = tmpKitName;
+                        }
+                    }
+                    allMaps.put(map, kitName);
                 }
             }
         }
 
         log.info(String.format("[%s] Finishing setup...", getDescription().getName()));
-
-        mapsYML = new YMLUtils("maps.yml");
-        kitsYML = new YMLUtils("kits.yml");
-        statsYML = new YMLUtils("stats.yml");
-        messagesYML = new YMLUtils("messages.yml");
-
-        messagesYML.saveConfig();
 
         textManager = new TextManager();
 
@@ -82,13 +107,6 @@ public final class KitDuels extends JavaPlugin {
                 for (String map : maps) {
                     enabledMaps.put(map, new ArrayList<>());
                 }
-            }
-        }
-
-        if (kitsYML.getConfig().contains("allKits")) {
-            if (kitsYML.getConfig().get("allKits") != null) {
-                List<String> kits = kitsYML.getConfig().getStringList("allKits");
-                allKits.addAll(kits);
             }
         }
 

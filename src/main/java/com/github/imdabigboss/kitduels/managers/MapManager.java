@@ -22,7 +22,7 @@ public class MapManager {
         wc.type(WorldType.NORMAL);
         World out = wc.createWorld();
         setMapGameRules(out);
-        KitDuels.allMaps.add(name);
+        KitDuels.allMaps.put(name, "");
         KitDuels.getInstance().getConfig().set("allMaps", KitDuels.allMaps);
         KitDuels.getInstance().saveConfig();
     }
@@ -122,17 +122,19 @@ public class MapManager {
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
 
-        ItemStack item = new ItemStack(Material.CHEST);
+        ItemStack item = new ItemStack(Material.RED_DYE);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(KitDuels.getTextManager().get("items.kitSelect"));
-        item.setItemMeta(meta);
-        player.getInventory().setItem(0, item);
-
-        item = new ItemStack(Material.RED_DYE);
-        meta = item.getItemMeta();
         meta.setDisplayName(KitDuels.getTextManager().get("items.leaveGame"));
         item.setItemMeta(meta);
         player.getInventory().setItem(8, item);
+
+        if (KitDuels.allMaps.get(map).equalsIgnoreCase("")) {
+            item = new ItemStack(Material.CHEST);
+            meta = item.getItemMeta();
+            meta.setDisplayName(KitDuels.getTextManager().get("items.kitSelect"));
+            item.setItemMeta(meta);
+            player.getInventory().setItem(0, item);
+        }
 
         String message = KitDuels.getTextManager().get("messages.playerJoined", player.getDisplayName(), playerNum, getMapMaxPlayers(map));
         for (Player mapPlayer : KitDuels.enabledMaps.get(map)) {
@@ -246,14 +248,19 @@ public class MapManager {
             mapPlayer.setGameMode(GameMode.SURVIVAL);
 
             if (KitDuels.allKits.size() > 0) {
-                String kitName;
-                if (KitDuels.playerKits.containsKey(mapPlayer)) {
+                String kitName = "";
+
+                if (!KitDuels.allMaps.get(map).equalsIgnoreCase("")) {
+                    kitName = KitDuels.allMaps.get(map);
+                } else if (KitDuels.playerKits.containsKey(mapPlayer)) {
                     kitName = KitDuels.playerKits.get(mapPlayer);
                 } else {
                     int index = new Random().nextInt(KitDuels.allKits.size());
                     kitName = KitDuels.allKits.get(index);
                 }
-                GameManager.loadKitToPlayer(mapPlayer, kitName);
+                if (!kitName.equalsIgnoreCase("")) {
+                    GameManager.loadKitToPlayer(mapPlayer, kitName);
+                }
                 mapPlayer.sendMessage(KitDuels.getTextManager().get("messages.gotKit", kitName));
             } else {
                 if (mapPlayer.isOp()) {
