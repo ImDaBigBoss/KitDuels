@@ -1,0 +1,40 @@
+name: KitDuels
+main: com.github.imdabigboss.kitduels.nukkit.KitDuels
+version: ${project.version}
+api: ["1.0.5"]
+load: POSTWORLD
+author: ImDaBigBoss
+authors: []
+description: This is a simple kit duels plugin.
+website: https://github.com/ImDaBigBoss/KitDuels
+softdepend: []
+prefix: "KitDuels"
+loadbefore: []
+
+commands:
+  kd:
+    permission: kitduels.kd
+  kdkits:
+    permission: kitduels.kdkits
+  joingame:
+    permission: kitduels.joingame
+  leavegame:
+    permission: kitduels.leavegame
+  kitselect:
+    permission: kitduels.kitselect
+  kdstats:
+    permission: kitduels.kdstats
+
+permissions:
+  kitduels.kd:
+    default: op
+  kitduels.kdkits:
+    default: op
+  kitduels.joingame:
+    default: true
+  kitduels.leavegame:
+    default: true
+  kitduels.kitselect:
+    default: true
+  kitduels.kdstats:
+    default: true

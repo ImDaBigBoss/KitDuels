@@ -1,0 +1,10 @@
+leaderboardLines: 5
+
+disableDamageWhenNotInGame: true
+disableDamageInSelectWorlds: true
+lobbyWorlds:
+  - world
+  - lobby
+
+gameStartTime: 10
+gameEndTime: 10
