@@ -26,4 +26,5 @@ jobs:
         prerelease: false
         title: "Latest build"
         files: | 
-            target/KitDuels.jar
+            spigot/target/KitDuels-Spigot.jar
+            nukkit/target/KitDuels-Nukkit.jar
