@@ -111,16 +111,6 @@ public class NukkitPlayer implements com.github.imdabigboss.kitduels.common.inte
     }
 
     @Override
-    public void setFoodLevel(int foodLevel) {
-        this.player.getFoodData().setLevel(foodLevel);
-    }
-
-    @Override
-    public int getFoodLevel() {
-        return this.player.getFoodData().getLevel();
-    }
-
-    @Override
     public void clearPotionEffects() {
         this.player.removeAllEffects();
     }

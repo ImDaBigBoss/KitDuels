@@ -110,16 +110,6 @@ public class SpigotPlayer implements com.github.imdabigboss.kitduels.common.inte
     }
 
     @Override
-    public void setFoodLevel(int foodLevel) {
-        this.player.setFoodLevel(foodLevel);
-    }
-
-    @Override
-    public int getFoodLevel() {
-        return this.player.getFoodLevel();
-    }
-
-    @Override
     public void clearPotionEffects() {
         for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());

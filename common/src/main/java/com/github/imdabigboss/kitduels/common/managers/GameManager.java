@@ -178,7 +178,6 @@ public class GameManager {
 
                 if (player.isOnline()) {
                     player.setHealth(20);
-                    player.setFoodLevel(20);
                     player.clearPotionEffects();
                     sendToSpawn(player);
                     player.sendMessage(plugin.getTextManager().get("messages.youLeft"));
@@ -231,7 +230,6 @@ public class GameManager {
         for (CommonPlayer mapPlayer : enabledMaps.get(map)) {
             mapAlivePlayers.get(map).add(mapPlayer);
             mapPlayer.setHealth(20);
-            mapPlayer.setFoodLevel(20);
             mapPlayer.clearInventory();
             mapPlayer.setFireTicks(0);
             mapPlayer.clearPotionEffects();
@@ -280,7 +278,6 @@ public class GameManager {
             }
 
             player.setHealth(20);
-            player.setFoodLevel(20);
             player.setFireTicks(0);
             player.clearPotionEffects();
             sendToSpawn(player);

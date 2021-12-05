@@ -3,6 +3,7 @@ package com.github.imdabigboss.kitduels.spigot.util;
 import com.github.imdabigboss.kitduels.spigot.KitDuels;
 import com.github.imdabigboss.kitduels.spigot.interfaces.Location;
 
+import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -72,7 +73,20 @@ public class YMLUtils implements com.github.imdabigboss.kitduels.common.util.YML
 
     @Override
     public Location getLocation(String path) {
-        return new Location(this.configuration.getLocation(path), plugin.getServer());
+        World world = null;
+        if (this.configuration.contains(path + ".world")) {
+            world = this.plugin.getServer().getWorld(this.configuration.getString(path + ".world"));
+        }
+
+        double x = this.configuration.getDouble(path + ".x");
+        double y = this.configuration.getDouble(path + ".y");
+        double z = this.configuration.getDouble(path + ".z");
+
+        float yaw = (float) this.configuration.getDouble(path + ".yaw");
+        float pitch = (float) this.configuration.getDouble(path + ".pitch");
+
+        org.bukkit.Location spigotLoc = new org.bukkit.Location(world, x, y, z, yaw, pitch);
+        return new Location(spigotLoc, this.plugin.getServer());
     }
 
     @Override
@@ -88,5 +102,25 @@ public class YMLUtils implements com.github.imdabigboss.kitduels.common.util.YML
     @Override
     public void set(String path, Object value) {
         this.configuration.set(path, value);
+    }
+
+    @Override
+    public void setLocation(String path, com.github.imdabigboss.kitduels.common.interfaces.Location location) {
+        if (location == null) {
+            return;
+        }
+
+        this.configuration.set(path, null);
+
+        if (location.hasWorld()) {
+            this.configuration.set(path + ".world", location.getWorld());
+        }
+
+        this.configuration.set(path + ".x", location.getX());
+        this.configuration.set(path + ".y", location.getY());
+        this.configuration.set(path + ".z", location.getZ());
+
+        this.configuration.set(path + ".yaw", location.getYaw());
+        this.configuration.set(path + ".pitch", location.getPitch());
     }
 }

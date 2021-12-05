@@ -1,6 +1,7 @@
 package com.github.imdabigboss.kitduels.spigot;
 
 import com.github.imdabigboss.kitduels.common.interfaces.CommonPlayer;
+import com.github.imdabigboss.kitduels.common.interfaces.Location;
 import com.github.imdabigboss.kitduels.common.util.GameMode;
 import com.github.imdabigboss.kitduels.common.util.Sounds;
 import com.github.imdabigboss.kitduels.spigot.interfaces.SpigotPlayer;
@@ -31,7 +32,13 @@ public class EventListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         SpigotPlayer player = new SpigotPlayer(event.getPlayer());
-        plugin.getGameManager().sendToSpawn(player);
+        if (plugin.getConfigYML().contains("lobbySpawn")) {
+            Location location = plugin.getConfigYML().getLocation("lobbySpawn");
+            player.teleport(location);
+        } else {
+            Location location = plugin.getWorldUtils().getSpawnLocation();
+            player.teleport(location);
+        }
         plugin.getPlayerUtils().registerPlayer(player);
     }
 
@@ -99,7 +106,6 @@ public class EventListener implements Listener {
 
                         for (CommonPlayer mapPlayer : plugin.getGameManager().enabledMaps.get(map)) {
                             mapPlayer.setHealth(20);
-                            mapPlayer.setFoodLevel(20);
                             mapPlayer.sendMessage(plugin.getTextManager().get("messages.playerWon", winPlayer.getDisplayName()));
                             if (mapPlayer.getName().equals(winPlayer.getName())) {
                                 mapPlayer.sendTitle(plugin.getTextManager().get("messages.gameOverTitles.win.title"), plugin.getTextManager().get("messages.gameOverTitles.win.subtitle"), 0, 60, 10);
@@ -138,19 +144,17 @@ public class EventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onHungerDeplete(FoodLevelChangeEvent event) {
         Player player = (Player) event.getEntity();
+
         if (plugin.getGameManager().playerMaps.containsKey(player.getName())) {
-            event.setCancelled(true);
-            player.setFoodLevel(20);
+            event.setFoodLevel(20);
         } else {
             if (KitDuels.disableDamageWhenNotInGame) {
                 if (KitDuels.disableDamageInSelectWorlds) {
                     if (KitDuels.lobbyWorlds.contains(player.getWorld().getName())) {
-                        event.setCancelled(true);
-                        player.setFoodLevel(20);
+                        event.setFoodLevel(20);
                     }
                 } else {
-                    event.setCancelled(true);
-                    player.setFoodLevel(20);
+                    event.setFoodLevel(20);
                 }
             }
         }

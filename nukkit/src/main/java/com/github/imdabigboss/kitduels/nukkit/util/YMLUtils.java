@@ -93,10 +93,13 @@ public class YMLUtils implements com.github.imdabigboss.kitduels.common.util.YML
         this.configuration.set(path, value);
     }
 
-    public void setLocation(String path, Location location) {
+    @Override
+    public void setLocation(String path, com.github.imdabigboss.kitduels.common.interfaces.Location location) {
         if (location == null) {
             return;
         }
+
+        this.configuration.set(path, null);
 
         if (location.hasWorld()) {
             this.configuration.set(path + ".world", location.getWorld());

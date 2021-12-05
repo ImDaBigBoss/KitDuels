@@ -5,7 +5,6 @@ import com.github.imdabigboss.kitduels.common.interfaces.Location;
 import java.io.File;
 
 public interface WorldUtils {
-    boolean copyWorld(File source, File target);
     boolean deleteWorld(String world);
     boolean deleteWorld(File path);
     void unloadWorld(String world);

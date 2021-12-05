@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class EmptyWorldGen extends Generator {
     private ChunkManager chunkManager;
+    private final String NAME = "EmptyWorldGen";
+
+    public EmptyWorldGen(Map options) {
+        /* empty */
+    }
 
     @Override
     public int getId() {
@@ -37,7 +42,7 @@ public class EmptyWorldGen extends Generator {
 
     @Override
     public String getName() {
-        return "emptyworldgen";
+        return NAME;
     }
 
     @Override

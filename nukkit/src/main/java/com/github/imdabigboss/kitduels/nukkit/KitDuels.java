@@ -51,7 +51,7 @@ public class KitDuels extends PluginBase implements com.github.imdabigboss.kitdu
     @Override
     public void onEnable() {
         log = new Logger(this.getLogger());
-        Generator.addGenerator(EmptyWorldGen.class, "EmptyWorldGen", 1);
+        Generator.addGenerator(EmptyWorldGen.class, "EmptyWorldGen", Generator.TYPE_INFINITE);
 
         log.info("Loading configurations");
 

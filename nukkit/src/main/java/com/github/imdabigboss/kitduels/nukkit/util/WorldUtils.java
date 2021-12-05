@@ -1,5 +1,7 @@
 package com.github.imdabigboss.kitduels.nukkit.util;
 
+import cn.nukkit.block.Block;
+import cn.nukkit.math.Vector3;
 import com.github.imdabigboss.kitduels.common.interfaces.Location;
 
 import com.github.imdabigboss.kitduels.nukkit.KitDuels;
@@ -16,43 +18,6 @@ public class WorldUtils implements com.github.imdabigboss.kitduels.common.util.W
 
     public WorldUtils(KitDuels plugin) {
         this.plugin = plugin;
-    }
-
-    @Override
-    public boolean copyWorld(File source, File target) {
-        try {
-            ArrayList<String> ignore = new ArrayList<>(Arrays.asList("uid.dat", "session.dat"));
-            if(!ignore.contains(source.getName())) {
-                if(source.isDirectory()) {
-                    if(!target.exists()) {
-                        target.mkdirs();
-                    }
-
-                    String[] files = source.list();
-                    if (files == null) {
-                        return false;
-                    }
-
-                    for (String file : files) {
-                        File srcFile = new File(source, file);
-                        File destFile = new File(target, file);
-                        copyWorld(srcFile, destFile);
-                    }
-                } else {
-                    InputStream in = new FileInputStream(source);
-                    OutputStream out = new FileOutputStream(target);
-                    byte[] buffer = new byte[1024];
-                    int length;
-                    while ((length = in.read(buffer)) > 0)
-                        out.write(buffer, 0, length);
-                    in.close();
-                    out.close();
-                }
-            }
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
     }
 
     @Override
@@ -87,7 +52,7 @@ public class WorldUtils implements com.github.imdabigboss.kitduels.common.util.W
 
     @Override
     public Location getSpawnLocation() {
-        return getSpawnLocation("world");
+        return getSpawnLocation(plugin.getServer().getDefaultLevel().getName());
     }
 
     @Override
@@ -99,9 +64,11 @@ public class WorldUtils implements com.github.imdabigboss.kitduels.common.util.W
     public void createWorld(String name) {
         plugin.getServer().generateLevel(name, 9999999L, EmptyWorldGen.class);
         plugin.getServer().loadLevel(name);
+        Level level = plugin.getServer().getLevelByName(name);
 
-        setGameRules(plugin.getServer().getLevelByName(name));
+        level.setBlock(new Vector3(128, 64, 128), Block.get(Block.BEDROCK));
 
+        setGameRules(level);
     }
 
     @Override

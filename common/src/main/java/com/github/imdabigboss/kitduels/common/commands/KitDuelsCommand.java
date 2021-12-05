@@ -45,7 +45,7 @@ public class KitDuelsCommand {
 
                         plugin.getGameManager().editModePlayers.put(player.getName(), args[1]);
                         plugin.getGameManager().inUseMaps.put(args[1], 0);
-                        mapsYML.set(args[1] + ".world", player.getLocation());
+                        mapsYML.setLocation(args[1] + ".world", player.getLocation());
                         sender.sendMessage(textManager.get("general.info.mapAdded"));
                     } else {
                         sender.sendMessage(textManager.get("general.errors.mapAlreadyExists"));
@@ -139,7 +139,7 @@ public class KitDuelsCommand {
                                 return true;
                             }
 
-                            mapsYML.set(plugin.getGameManager().editModePlayers.get(player.getName()) + ".spawn" + num, player.getLocation());
+                            mapsYML.setLocation(plugin.getGameManager().editModePlayers.get(player.getName()) + ".spawn" + num, player.getLocation());
                             sender.sendMessage(textManager.get("general.info.spawnPointSet", num, maxnum));
                         } catch (NumberFormatException e) {
                             sender.sendMessage(textManager.get("general.errors.notANum"));
@@ -225,8 +225,8 @@ public class KitDuelsCommand {
                 }
 
                 CommonPlayer player = sender.getPlayer();
-                plugin.getConfigYML().set("lobbySpawn", player.getLocation());
-                sender.sendMessage(textManager.get("general.info.lobbySpawnSet"));
+                plugin.getConfigYML().setLocation("lobbySpawn", player.getLocation());
+                sender.sendMessage(textManager.get("general.info.lobbySpawnPointSet"));
             } else if (args[0].equals("list")) {
                 Set<String> keys = mapsYML.getKeys(false);
                 String maps = textManager.get("general.info.mapList.header");
@@ -288,7 +288,7 @@ public class KitDuelsCommand {
                 }
                 String playerMap = plugin.getGameManager().editModePlayers.get(player.getName());
 
-                mapsYML.set(playerMap + "." + args[0], player.getLocation());
+                mapsYML.setLocation(playerMap + "." + args[0], player.getLocation());
                 sender.sendMessage(textManager.get("general.info.resetPosSet", args[0]));
             } else if (args[0].equalsIgnoreCase("setHolo")) {
                 if (!plugin.getHologramsEnabled()) {

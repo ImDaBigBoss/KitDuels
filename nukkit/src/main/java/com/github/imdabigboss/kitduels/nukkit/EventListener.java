@@ -1,6 +1,7 @@
 package com.github.imdabigboss.kitduels.nukkit;
 
 import com.github.imdabigboss.kitduels.common.interfaces.CommonPlayer;
+import com.github.imdabigboss.kitduels.common.interfaces.Location;
 import com.github.imdabigboss.kitduels.nukkit.interfaces.NukkitPlayer;
 
 import com.github.imdabigboss.kitduels.common.util.GameMode;
@@ -31,14 +32,22 @@ public class EventListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         NukkitPlayer player = new NukkitPlayer(event.getPlayer());
-        plugin.getGameManager().sendToSpawn(player);
+        plugin.getServer().getScheduler().scheduleDelayedTask(this.plugin, () -> {
+            if (plugin.getConfigYML().contains("lobbySpawn")) {
+                Location location = plugin.getConfigYML().getLocation("lobbySpawn");
+                player.teleport(location);
+            } else {
+                Location location = plugin.getWorldUtils().getSpawnLocation();
+                player.teleport(location);
+            }
+        }, 20);
         plugin.getPlayerUtils().registerPlayer(player);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLeave(PlayerQuitEvent event) {
         NukkitPlayer player = new NukkitPlayer(event.getPlayer());
         plugin.getGameManager().removePlayerFromMap(player);
@@ -112,7 +121,6 @@ public class EventListener implements Listener {
 
                         for (CommonPlayer mapPlayer : plugin.getGameManager().enabledMaps.get(map)) {
                             mapPlayer.setHealth(20);
-                            mapPlayer.setFoodLevel(20);
                             mapPlayer.sendMessage(plugin.getTextManager().get("messages.playerWon", winPlayer.getDisplayName()));
                             if (mapPlayer.getName().equals(winPlayer.getName())) {
                                 mapPlayer.sendTitle(plugin.getTextManager().get("messages.gameOverTitles.win.title"), plugin.getTextManager().get("messages.gameOverTitles.win.subtitle"), 0, 60, 10);
@@ -149,21 +157,17 @@ public class EventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onHungerDeplete(PlayerFoodLevelChangeEvent event) {
         Player player = event.getPlayer();
-        NukkitPlayer nukkitPlayer = new NukkitPlayer(player);
 
-        if (plugin.getGameManager().playerMaps.containsKey(nukkitPlayer.getName())) {
-            event.setCancelled(true);
-            player.getFoodData().setLevel(20);
+        if (plugin.getGameManager().playerMaps.containsKey(player.getName())) {
+            event.setFoodLevel(20);
         } else {
             if (KitDuels.disableDamageWhenNotInGame) {
                 if (KitDuels.disableDamageInSelectWorlds) {
                     if (KitDuels.lobbyWorlds.contains(player.getLevel().getName())) {
-                        event.setCancelled(true);
-                        player.getFoodData().setLevel(20);
+                        event.setFoodLevel(20);
                     }
                 } else {
-                    event.setCancelled(true);
-                    player.getFoodData().setLevel(20);
+                    event.setFoodLevel(20);
                 }
             }
         }

@@ -20,4 +20,5 @@ public interface YMLUtils {
     Set<String> getKeys(boolean deep);
 
     void set(String path, Object value);
+    void setLocation(String path, Location location);
 }

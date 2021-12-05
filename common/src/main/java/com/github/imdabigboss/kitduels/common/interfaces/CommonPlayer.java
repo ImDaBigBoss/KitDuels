@@ -32,9 +32,6 @@ public interface CommonPlayer {
     void setHealth(double health);
     double getHealth();
 
-    void setFoodLevel(int foodLevel);
-    int getFoodLevel();
-
     void clearPotionEffects();
 
     void setFireTicks(int fireTicks);
