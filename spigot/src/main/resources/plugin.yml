@@ -3,6 +3,7 @@ version: ${project.version}
 main: com.github.imdabigboss.kitduels.spigot.KitDuels
 api-version: 1.17
 softdepend: [VoidGenerator, WorldEdit, HolographicDisplays]
+depend: [floodgate]
 
 commands:
   kd:

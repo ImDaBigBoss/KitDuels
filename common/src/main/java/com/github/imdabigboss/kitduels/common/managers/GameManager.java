@@ -39,7 +39,7 @@ public class GameManager {
     public void createMap(String name) {
         plugin.getWorldUtils().createWorld(name);
         allMaps.put(name, "");
-        plugin.getConfigYML().set("allMaps", allMaps);
+        plugin.getConfigYML().set("allMaps", allMaps.keySet());
         plugin.getConfigYML().saveConfig();
     }
 

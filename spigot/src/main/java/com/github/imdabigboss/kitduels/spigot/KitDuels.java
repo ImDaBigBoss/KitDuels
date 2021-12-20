@@ -23,6 +23,8 @@ import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 
 import org.bukkit.*;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.geysermc.cumulus.Forms;
+import org.geysermc.floodgate.api.FloodgateApi;
 
 import java.util.*;
 
@@ -52,9 +54,20 @@ public final class KitDuels extends JavaPlugin implements com.github.imdabigboss
     public static boolean disableDamageInSelectWorlds = true;
     public static List<String> lobbyWorlds = new ArrayList<>();
 
+    private static boolean floodgateEnabled = false;
+
     @Override
     public void onEnable() {
         log = new Logger(java.util.logging.Logger.getLogger("Minecraft"), this.getDescription().getName());
+
+        if (this.getServer().getPluginManager().getPlugin("floodgate") != null) {
+            if (FloodgateApi.getInstance() != null) {
+                floodgateEnabled = true;
+                log.info("Floodgate found!");
+            } else {
+                log.info("Floodgate found, but API is null!");
+            }
+        }
 
         log.info("Loading configurations");
 
@@ -284,5 +297,9 @@ public final class KitDuels extends JavaPlugin implements com.github.imdabigboss
     @Override
     public InventorySerialization getInventorySerialization() {
         return inventorySerialization;
+    }
+
+    public boolean isFloodgateEnabled() {
+        return floodgateEnabled;
     }
 }

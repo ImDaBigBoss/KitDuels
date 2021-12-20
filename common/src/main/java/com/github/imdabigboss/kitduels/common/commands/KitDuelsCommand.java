@@ -68,7 +68,7 @@ public class KitDuelsCommand {
 
                         if (plugin.getGameManager().allMaps.containsKey(args[1])) {
                             plugin.getGameManager().allMaps.remove(args[1]);
-                            plugin.getConfigYML().set("allMaps", plugin.getGameManager().allMaps);
+                            plugin.getConfigYML().set("allMaps", plugin.getGameManager().allMaps.keySet());
                         }
 
                         mapsYML.set(args[1], null);
@@ -302,7 +302,7 @@ public class KitDuelsCommand {
 
                 CommonPlayer player = sender.getPlayer();
                 plugin.getHologramManager().updateHolo(player.getLocation());
-                plugin.getConfigYML().set("hologramPos", player.getLocation());
+                plugin.getConfigYML().setLocation("hologramPos", player.getLocation());
                 sender.sendMessage(textManager.get("general.info.hologramPosSet"));
             } else if (args[0].equalsIgnoreCase("delHolo")) {
                 plugin.getHologramManager().deleteAllHolos();
@@ -340,6 +340,6 @@ public class KitDuelsCommand {
     }
 
     public void sendHelp(CommonCommandSender sender) {
-        sender.sendMessage("The correct usage is:\n - create <name>\n - delete <name>\n - maxPlayers <number>\n - spawn <number>\n - save\n - edit <name>\n - lobbySpawn\n - list\n - enable <name>\n - disable <name>\n - pos1\n - pos2\n - setHolo\n - delHolo\n setKit <name>");
+        sender.sendMessage("The correct usage is:\n - create <name>\n - delete <name>\n - maxPlayers <number>\n - spawn <number>\n - save\n - edit <name>\n - lobbySpawn\n - list\n - enable <name>\n - disable <name>\n - pos1\n - pos2\n - setHolo\n - delHolo\n - setKit <name>");
     }
 }

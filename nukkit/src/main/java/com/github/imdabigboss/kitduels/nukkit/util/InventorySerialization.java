@@ -52,7 +52,8 @@ public class InventorySerialization implements com.github.imdabigboss.kitduels.c
             dataOutput.close();
             return Base64Coder.encodeLines(outputStream.toByteArray());
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to save item stacks.", e);
+            plugin.getLog().error(e.toString());
+            throw new IllegalStateException("Unable to save items.", e);
         }
     }
 
@@ -73,7 +74,8 @@ public class InventorySerialization implements com.github.imdabigboss.kitduels.c
             dataOutput.close();
             return Base64Coder.encodeLines(outputStream.toByteArray());
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to save item stacks.", e);
+            plugin.getLog().error(e.toString());
+            throw new IllegalStateException("Unable to save items.", e);
         }
     }
 
