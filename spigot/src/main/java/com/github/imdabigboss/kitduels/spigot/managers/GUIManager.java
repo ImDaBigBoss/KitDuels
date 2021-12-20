@@ -298,7 +298,7 @@ public class GUIManager implements com.github.imdabigboss.kitduels.common.manage
                     if (inUse) {
                         outform = outform.button(buttonText, FormImage.Type.PATH, inUseIcon);
                     } else {
-                        outform = outform.button(buttonText, FormImage.Type.PATH, mapIcon;
+                        outform = outform.button(buttonText, FormImage.Type.PATH, mapIcon);
                     }
 
                     mapsDisplayed.add(map);
