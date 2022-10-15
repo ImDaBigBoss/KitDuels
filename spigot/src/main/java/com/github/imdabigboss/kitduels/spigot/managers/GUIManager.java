@@ -57,6 +57,7 @@ public class GUIManager implements com.github.imdabigboss.kitduels.common.manage
         showMapSelectorJava(player, byKit);
     }
 
+
     private String randomIcon = "textures/ui/refresh.png";
     private String kitIcon = "textures/ui/new_offer_symbol.png";
     private String mapIcon = "textures/ui/new_offer_symbol.png";

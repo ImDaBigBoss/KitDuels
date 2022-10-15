@@ -10,6 +10,8 @@ import java.util.*;
 public class GameManager {
     private KitDuels plugin;
 
+    private Random random = new Random();
+
     public Map<String, String> editModePlayers = new HashMap<>();
 
     public Map<String, List<CommonPlayer>> enabledMaps = new HashMap<>();
@@ -68,7 +70,7 @@ public class GameManager {
         }
 
         if (currentNumPlayers == 0) {
-            int index = new Random().nextInt(enabledMaps.size());
+            int index = random.nextInt(enabledMaps.size());
             currentMap = new ArrayList<>(enabledMaps.keySet()).get(index);
         }
 
@@ -97,7 +99,7 @@ public class GameManager {
         }
 
         if (currentNumPlayers == 0) {
-            int index = new Random().nextInt(maps.size());
+            int index = random.nextInt(maps.size());
             currentMap = maps.get(index);
         }
 
@@ -246,7 +248,7 @@ public class GameManager {
                 } else if (plugin.getKitManager().getPlayerKits().containsKey(mapPlayer.getName())) {
                     kitName = plugin.getKitManager().getPlayerKits().get(mapPlayer.getName());
                 } else {
-                    int index = new Random().nextInt(plugin.getKitManager().getKits().size());
+                    int index = random.nextInt(plugin.getKitManager().getKits().size());
                     kitName = plugin.getKitManager().getKits().get(index);
                 }
                 if (!kitName.equalsIgnoreCase("")) {

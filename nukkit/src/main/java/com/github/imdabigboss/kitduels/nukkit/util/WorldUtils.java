@@ -36,9 +36,13 @@ public class WorldUtils implements com.github.imdabigboss.kitduels.common.util.W
 
             for (File file : files) {
                 if (file.isDirectory()) {
-                    deleteWorld(file);
+                    if (!deleteWorld(file)) {
+                        return false;
+                    }
                 } else {
-                    file.delete();
+                    if (!file.delete()) {
+                        return false;
+                    }
                 }
             }
         }

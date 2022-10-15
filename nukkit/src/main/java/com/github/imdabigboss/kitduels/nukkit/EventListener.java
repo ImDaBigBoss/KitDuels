@@ -116,6 +116,10 @@ public class EventListener implements Listener {
                         for (CommonPlayer alivePlayer : plugin.getGameManager().mapAlivePlayers.get(map)) {
                             winPlayer = alivePlayer;
                         }
+                        if (winPlayer == null) {
+                            plugin.getLog().error("Win player is null in map " + map + "! Please contact a developer!");
+                            return;
+                        }
 
                         plugin.getGameManager().ongoingMaps.remove(map);
 
